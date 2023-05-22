@@ -23,63 +23,66 @@ cursor = db.cursor()
 # Creates a DB that doesn't exist yet
 cursor.execute("CREATE DATABASE if not exists Smart_Blinds;")
 cursor.execute("USE Smart_Blinds;")
-
-# Create a Menu_Items table
-cursor.execute("drop table if exists Sensors;")
+# <----------------------------------------------------------->
+# Creating Tables
 try:
+   # Create a Users table
    cursor.execute("""
-   CREATE TABLE if not exists Sensors (
-       id                  INTEGER  AUTO_INCREMENT PRIMARY KEY,
-       name                VARCHAR(25) NOT NULL,  
-       sensor_value        DECIMAL(10, 2) NOT NULL,
-       created_at          TIMESTAMP,
-       updated             TIMESTAMP
+   CREATE TABLE if not exists Users (
+       id                   INTEGER  AUTO_INCREMENT PRIMARY KEY,
+       Username             VARCHAR(25) NOT NULL,  
+       Password             VARCHAR(100) NOT NULL,  
+       Email                VARCHAR(50) NOT NULL,  
+       created_at           TIMESTAMP
    );
  """)
-   
-   # Initiates the starting rows to be changed during runtime
-   query = "INSERT INTO Sensors (name, sensor_value, created_at, updated) VALUES (%s, %s, %s, %s)"
-   values = [  ('accelx',
-               0.00, 
-               datetime.datetime.now(),
-               datetime.datetime.now()),
-               ('gyrox',
-               0.00, 
-               datetime.datetime.now(),
-               datetime.datetime.now()),
-
-               ('accely',
-               0.00, 
-               datetime.datetime.now(),
-               datetime.datetime.now()),
-               ('gyroy',
-               0.00, 
-               datetime.datetime.now(),
-               datetime.datetime.now()),
-
-               ('accelz',
-               0.00, 
-               datetime.datetime.now(),
-               datetime.datetime.now()),
-               ('gyroz',
-               0.00, 
-               datetime.datetime.now(),
-               datetime.datetime.now()),
-               
-               ('infra',
-               0.00, 
-               datetime.datetime.now(),
-               datetime.datetime.now()),
-               ('ultra',
-               0.00, 
-               datetime.datetime.now(),
-               datetime.datetime.now()),
-               ('photo',
-               0.00, 
-               datetime.datetime.now(),
-               datetime.datetime.now())]
-   cursor.executemany(query, values)
-   
+   # Create an Active_Users table
+   cursor.execute("""
+   CREATE TABLE if not exists Active_Users (
+       id                   INTEGER  AUTO_INCREMENT PRIMARY KEY,
+       Username             VARCHAR(25) NOT NULL,
+       Cookie               VARCHAR(100) NOT NULL,
+       created_at           TIMESTAMP
+   );
+ """)
+   # Create a Schedule table
+   cursor.execute("""
+   CREATE TABLE if not exists Schedule (
+       id                   INTEGER  AUTO_INCREMENT PRIMARY KEY,
+       Serial               VARCHAR(25) NOT NULL,  
+       Start_Time           VARCHAR(10) NOT NULL,  
+       End_Time             VARCHAR(10) NOT NULL,  
+       State                INTEGER(1) NOT NULL,  
+       created_at           TIMESTAMP
+   );
+ """)
+   # Create a State table
+   cursor.execute("""
+   CREATE TABLE if not exists State (
+       id                   INTEGER  AUTO_INCREMENT PRIMARY KEY,
+       Serial               VARCHAR(25) NOT NULL, 
+       State                INTEGER(1) NOT NULL,   
+       created_at           TIMESTAMP
+   );
+ """)
+   # Create an Owners table
+   cursor.execute("""
+   CREATE TABLE if not exists Owners (
+       id                   INTEGER  AUTO_INCREMENT PRIMARY KEY,
+       Username             VARCHAR(25) NOT NULL,  
+       Serial               VARCHAR(25) NOT NULL,   
+       Product_Name         VARCHAR(50) NOT NULL,  
+       created_at           TIMESTAMP
+   );
+ """)
+   # Create an Unregistered table
+   cursor.execute("""
+   CREATE TABLE if not exists Unregistered (
+       id                   INTEGER  AUTO_INCREMENT PRIMARY KEY,
+       Serial               VARCHAR(25) NOT NULL,
+       created_at           TIMESTAMP
+   );
+ """)
 except RuntimeError as err:
    print("runtime error: {0}".format(err))
 
