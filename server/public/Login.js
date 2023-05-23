@@ -53,7 +53,7 @@ document.addEventListener("DOMContentLoaded", function() {
       return the_message;
     }
     // DOCUMENT ELEMENT VARIABLES ------------------------------------------------------>
-    form = document.getElementById("Login-Form");
+    var form = document.getElementById("Login-Form");
     var the_message;
 
     // EVENT LISTENERS ----------------------------------------------------------------->
