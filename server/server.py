@@ -240,12 +240,15 @@ def register_user(registration: Registration) -> dict:
 
 
 
-
 # Example route: return the homepage HTML page
 @app.get("/home", response_class=HTMLResponse)
 def get_home_html() -> HTMLResponse:
     with open("views/Home.html") as html:
         return HTMLResponse(content=html.read())
+
+
+
+
 
 
 
