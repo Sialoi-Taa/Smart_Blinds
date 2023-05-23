@@ -35,8 +35,6 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
 // DOCUMENT ELEMENT VARIABLES ------------------------------------------------------>
-    SignIn_Button = document.getElementById("Sign-In");
-    Register_Button = document.getElementById("Register");
 
 // EVENT LISTENERS ----------------------------------------------------------------->
 })
