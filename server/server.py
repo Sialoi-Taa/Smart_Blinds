@@ -53,6 +53,7 @@ class Login(BaseModel):
 
 
 # FUNCTIONS -------------------------------------------------------------------------------->
+# Function to find the existence of an email
 def find_email(Email):
     db = mysql.connect(host=db_host, database=db_name, user=db_user, passwd=db_pass)
     cursor = db.cursor()
@@ -64,6 +65,7 @@ def find_email(Email):
         return False
     return True
 
+# Function to check a user's login info is correct
 def check_password(Email, Password):
     db = mysql.connect(host=db_host, database=db_name, user=db_user, passwd=db_pass)
     cursor = db.cursor()
@@ -73,7 +75,8 @@ def check_password(Email, Password):
     if table_password is not None:
         return bcrypt.checkpw(Password.encode('utf-8'), table_password[0].encode('utf-8'))
     return False
-    
+
+# Function to find the existence of a username
 def find_username(Username):
     db = mysql.connect(host=db_host, database=db_name, user=db_user, passwd=db_pass)
     cursor = db.cursor()
@@ -85,6 +88,7 @@ def find_username(Username):
         return False
     return True
 
+# Function to create a new user in the database
 def create_user(Username, Password, Email):
     db = mysql.connect(host=db_host, database=db_name, user=db_user, passwd=db_pass)
     cursor = db.cursor()
@@ -93,12 +97,15 @@ def create_user(Username, Password, Email):
     db.commit()
     db.close()
 
-def create_session(response:Response, username:str) -> str:
+# Function to create a session ID
+def create_session(response:Response, Email:str) -> str:
   # Create a session ID
   session_id = secrets.token_urlsafe(16)
   # Connect to mysql
   db = mysql.connect(host=db_host, database=db_name, user=db_user, passwd=db_pass)
   cursor = db.cursor()
+  cursor.execute("SELECT Username FROM Users WHERE Email=%s", (Email))
+  username = cursor.fetchone()[0]
   # Delete the previous session for that username
   cursor.execute("DELETE FROM Active_Users WHERE Username='" + username + "';")
   # Insert a new session for that specific user
@@ -116,8 +123,49 @@ def create_session(response:Response, username:str) -> str:
     return ""
   # Give the client a cookie with the session ID
   response.set_cookie(key="session_id", value=session_id, max_age=900)
+  response.set_cookie(key="Username", value=username, max_age=900)
   # Return the session ID as a string
   return session_id
+
+# Function to check the existence of a session ID attached to a username and return what it finds
+def check_sessionID(Username: str):
+    db = mysql.connect(host=db_host, database=db_name, user=db_user, passwd=db_pass)
+    cursor = db.cursor()
+    cursor.execute("SELECT Cookie FROM Active_Users WHERE Username=%s", (Username))
+    session_ID = cursor.fetchone()
+    db.close()
+    if session_ID is None:
+        return []
+    return session_ID[0]
+
+# Function to use to see if a session should have expired
+def expired_session(session_ID):
+    db = mysql.connect(host=db_host, database=db_name, user=db_user, passwd=db_pass)
+    cursor = db.cursor()
+    cursor.execute("SELECT created_at FROM Active_Users WHERE Cookie=%s", (session_ID))
+    start_time = cursor.fetchone()[0]
+    db.close()
+    start_time = datetime.strptime(start_time, "%Y-%m-%d %H:%M:%S.%f")
+    end_time = datetime.now()
+    time_diff = end_time - start_time
+    if(time_diff > 900):
+        end_session(session_ID)
+        return True
+    return False
+
+# Function to end a session and delete it from the database
+def end_session(session_id:str) -> bool:
+  db = mysql.connect(host=db_host, database=db_name, user=db_user, passwd=db_pass)
+  cursor = db.cursor()
+  query = "DELETE FROM Active_Users WHERE Cookie='" + session_id + "';"
+  cursor.execute(query)
+  db.commit()
+  count = cursor.rowcount
+  db.close()
+  if count:
+    return True
+  return False
+
 
 # ROUTES -------------------------------------------------------------------------------->
 # Example route: return the landing HTML page
@@ -130,9 +178,17 @@ def get_landing_html() -> HTMLResponse:
 
 # Example route: return the login HTML page
 @app.get("/login", response_class=HTMLResponse)
-def get_login_html() -> HTMLResponse:
-    with open("views/Login.html") as html:
-        return HTMLResponse(content=html.read())
+def get_login_html(request: Request) -> HTMLResponse:
+    session_ID = request.cookies.get('session_id')
+    Username = request.cookies.get('Username')
+    table_session_ID = check_sessionID(Username)
+
+    if session_ID is not table_session_ID:
+        with open("views/Login.html") as html:
+            return HTMLResponse(content=html.read())
+    else:
+        with open("views/Home.html") as html:
+            return HTMLResponse(content=html.read())
 
 @app.put("/login")
 def verify_login(login: Login, response: Response) -> dict:
