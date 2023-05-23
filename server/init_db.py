@@ -32,8 +32,7 @@ try:
        id                   INTEGER  AUTO_INCREMENT PRIMARY KEY,
        Username             VARCHAR(25) NOT NULL,  
        Password             VARCHAR(100) NOT NULL,  
-       Email                VARCHAR(50) NOT NULL,  
-       created_at           TIMESTAMP
+       Email                VARCHAR(50) NOT NULL
    );
  """)
    # Create an Active_Users table
@@ -52,8 +51,7 @@ try:
        Serial               VARCHAR(25) NOT NULL,  
        Start_Time           VARCHAR(10) NOT NULL,  
        End_Time             VARCHAR(10) NOT NULL,  
-       State                INTEGER(1) NOT NULL,  
-       created_at           TIMESTAMP
+       State                INTEGER(1) NOT NULL
    );
  """)
    # Create a State table
@@ -61,8 +59,7 @@ try:
    CREATE TABLE if not exists State (
        id                   INTEGER  AUTO_INCREMENT PRIMARY KEY,
        Serial               VARCHAR(25) NOT NULL, 
-       State                INTEGER(1) NOT NULL,   
-       created_at           TIMESTAMP
+       State                INTEGER(1) NOT NULL
    );
  """)
    # Create an Owners table
@@ -71,16 +68,14 @@ try:
        id                   INTEGER  AUTO_INCREMENT PRIMARY KEY,
        Username             VARCHAR(25) NOT NULL,  
        Serial               VARCHAR(25) NOT NULL,   
-       Product_Name         VARCHAR(50) NOT NULL,  
-       created_at           TIMESTAMP
+       Product_Name         VARCHAR(50) NOT NULL
    );
  """)
    # Create an Unregistered table
    cursor.execute("""
    CREATE TABLE if not exists Unregistered (
        id                   INTEGER  AUTO_INCREMENT PRIMARY KEY,
-       Serial               VARCHAR(25) NOT NULL,
-       created_at           TIMESTAMP
+       Serial               VARCHAR(25) NOT NULL
    );
  """)
 except RuntimeError as err:

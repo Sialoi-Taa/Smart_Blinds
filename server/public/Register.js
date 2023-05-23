@@ -33,10 +33,35 @@ document.addEventListener("DOMContentLoaded", function() {
           })
           .catch(error => console.error('Error:', error));
         }
-    
-    // DOCUMENT ELEMENT VARIABLES ------------------------------------------------------>
 
+        // Function for submitting the form data
+        function submission(theForm) {
+          const data = Object.fromEntries(new FormData(theForm).entries());
+          // {"Email": input, "Username": input, "Password": input}
+          const url = "/register";
+          const verb = "post";
+          server_request(url, data, verb, function(response) {
+            message = response["message"]
+            if(message == "Username not unique") {
+              alert("Username is already in use! Please choose a different one.");
+              return false;
+            } else if(message == "Email already in use") {
+              alert("Email is in use with another account. Please choose a different one.");
+              return false;
+            }
+            return true;
+          })
+        }
+    // DOCUMENT ELEMENT VARIABLES ------------------------------------------------------>
+        Form = document.getElementById("Register-Form");
     
     // EVENT LISTENERS ----------------------------------------------------------------->
-        
+        Form.addEventListener("submit", function(event) {
+          event.preventDefault();
+          success = submission(Form);
+          if(success) {
+            alert("Welcome to the Smart Blinds family! >:D");
+            location.replace("/login");
+          }
+        });
     })
