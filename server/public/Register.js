@@ -40,21 +40,24 @@ document.addEventListener("DOMContentLoaded", function() {
           // {"Email": input, "Username": input, "Password": input}
           const url = "/register";
           const verb = "post";
+          let message
           // Will attempt to create a new user
-          server_request(url, data, verb, function(response) {
+          server_request(url, data, verb, (response) => {
             message = response["message"]
             if(message == "Username not unique") {
               alert("Username is already in use! Please choose a different one.");
-              return false;
+              the_message = false;
             } else if(message == "Email already in use") {
               alert("Email is in use with another account. Please choose a different one.");
-              return false;
+              the_message = false;
             }
-            return true;
+            the_message = true;
           })
+          return the_message
         }
     // DOCUMENT ELEMENT VARIABLES ------------------------------------------------------>
         Form = document.getElementById("Register-Form");
+        var the_message;
     
     // EVENT LISTENERS ----------------------------------------------------------------->
         Form.addEventListener("submit", function(event) {
