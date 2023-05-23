@@ -19,3 +19,11 @@ In the login page, the user's input will be processed and see if we have any cre
 ![Back End Design](images/BED.jpg)
 
 
+# NOTES FOR NEXT TIME
+You finished the landing, login, and registration page.
+You're starting the HTML and JS integration for the home page.
+You need to design a way for you to make the add button create an input form that will take the serial number and personal name.
+After the submit button is pressed, this information needs to be placed in the MySQL database under the *Owners* table and take the serial number off the *Unregistered* table.
+When that is done, let it be able to add a button to the product container that has the personal name on the button.
+If that button is pressed, then it'll take the user to that product's customization page
+The customization page will connect and change the Schedule and State tables accordingly and add multiprocessing that will run on the server to follow the scheduels.
