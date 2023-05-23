@@ -40,6 +40,7 @@ document.addEventListener("DOMContentLoaded", function() {
           // {"Email": input, "Username": input, "Password": input}
           const url = "/register";
           const verb = "post";
+          // Will attempt to create a new user
           server_request(url, data, verb, function(response) {
             message = response["message"]
             if(message == "Username not unique") {
@@ -57,11 +58,15 @@ document.addEventListener("DOMContentLoaded", function() {
     
     // EVENT LISTENERS ----------------------------------------------------------------->
         Form.addEventListener("submit", function(event) {
+          // Prevents the page form reloading
           event.preventDefault();
           success = submission(Form);
+          // If user was successfully created, then relocate them to the login page
           if(success) {
             alert("Welcome to the Smart Blinds family! >:D");
             location.replace("/login");
+          } else {
+            location.reload();
           }
         });
     })
