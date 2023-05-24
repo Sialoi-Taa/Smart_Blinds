@@ -27,3 +27,5 @@ After the submit button is pressed, this information needs to be placed in the M
 When that is done, let it be able to add a button to the product container that has the personal name on the button.
 If that button is pressed, then it'll take the user to that product's customization page
 The customization page will connect and change the Schedule and State tables accordingly and add multiprocessing that will run on the server to follow the schedules.
+
+* 5/24/23, 4:46 AM, 1018 lines
