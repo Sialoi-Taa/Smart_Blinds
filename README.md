@@ -20,12 +20,11 @@ In the login page, the user's input will be processed and see if we have any cre
 
 
 # NOTES FOR NEXT TIME
-You finished the landing, login, and registration page.
-You're starting the HTML and JS integration for the home page.
-You need to design a way for you to make the add button create an input form that will take the serial number and personal name.
-After the submit button is pressed, this information needs to be placed in the MySQL database under the *Owners* table and take the serial number off the *Unregistered* table.
-When that is done, let it be able to add a button to the product container that has the personal name on the button.
-If that button is pressed, then it'll take the user to that product's customization page
-The customization page will connect and change the Schedule and State tables accordingly and add multiprocessing that will run on the server to follow the schedules.
+* You finished the landing, login, and registration page.
+* You're finishing the HTML and JS integration for the home page.
+* You need to add the setInterval function to keep checking the cookies
+* After finishing up the Home page, get started on the Product page that will hold the customization for each individual product.
+* The customization page will connect and change the Schedule and State tables accordingly and possibly add multiprocessing that will run on the server to follow the schedules.
+* Look at a way for a controller to stay connected to the internet and keep getting server updates for IoT.
 
 * 5/24/23, 4:46 AM, 1018 lines
