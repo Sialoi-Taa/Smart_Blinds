@@ -47,7 +47,9 @@ class Login(BaseModel):
     Email: str
     Password: str
 
-
+class Owner(BaseModel):
+    Serial_Number: str
+    Product_Name: str
 
 
 
@@ -99,33 +101,31 @@ def create_user(Username, Password, Email):
 
 # Function to create a session ID
 def create_session(response:Response, Email:str) -> str:
-  # Create a session ID
-  session_id = secrets.token_urlsafe(16)
-  # Connect to mysql
-  db = mysql.connect(host=db_host, database=db_name, user=db_user, passwd=db_pass)
-  cursor = db.cursor()
-  cursor.execute("SELECT Username FROM Users WHERE Email=%s", (Email))
-  username = cursor.fetchone()[0]
-  # Delete the previous session for that username
-  cursor.execute("DELETE FROM Active_Users WHERE Username='" + username + "';")
-  # Insert a new session for that specific user
-  query = "INSERT INTO Active_Users (Username, Cookie, created_at) VALUES (%s, %s, %s);" 
-  value = (username, session_id, datetime.datetime.now())
-  cursor.execute(query, value)
-  # Commit to the database
-  db.commit()
-  # Count how many rows are affected
-  count = cursor.rowcount
-  # Close the database connection
-  db.close()
-  # If no rows are affected, return an empty string
-  if count == 0:
-    return ""
-  # Give the client a cookie with the session ID
-  response.set_cookie(key="session_id", value=session_id, max_age=900)
-  response.set_cookie(key="Username", value=username, max_age=900)
-  # Return the session ID as a string
-  return session_id
+    # Create a session ID
+    session_id = secrets.token_urlsafe(16)
+    # Connect to mysql
+    db = mysql.connect(host=db_host, database=db_name, user=db_user, passwd=db_pass)
+    cursor = db.cursor()
+    cursor.execute("SELECT Username FROM Users WHERE Email=%s", (Email))
+    username = cursor.fetchone()[0]
+    # Delete the previous session for that username
+    cursor.execute("DELETE FROM Active_Users WHERE Username=%s;", (username))
+    # Insert a new session for that specific user
+    cursor.execute("INSERT INTO Active_Users (Username, Cookie, created_at) VALUES (%s, %s, %s);", (username, session_id, datetime.datetime.now()))
+    # Commit to the database
+    db.commit()
+    # Count how many rows are affected
+    count = cursor.rowcount
+    # Close the database connection
+    db.close()
+    # If no rows are affected, return an empty string
+    if count == 0:
+        return ""
+    # Give the client a cookie with the session ID
+    response.set_cookie(key="session_id", value=session_id, max_age=900)
+    response.set_cookie(key="Username", value=username, max_age=900)
+    # Return the session ID as a string
+    return session_id
 
 # Function to check the existence of a session ID attached to a username and return what it finds
 def check_sessionID(Username: str):
@@ -155,16 +155,25 @@ def expired_session(session_ID):
 
 # Function to end a session and delete it from the database
 def end_session(session_id:str) -> bool:
-  db = mysql.connect(host=db_host, database=db_name, user=db_user, passwd=db_pass)
-  cursor = db.cursor()
-  query = "DELETE FROM Active_Users WHERE Cookie='" + session_id + "';"
-  cursor.execute(query)
-  db.commit()
-  count = cursor.rowcount
-  db.close()
-  if count:
-    return True
-  return False
+    db = mysql.connect(host=db_host, database=db_name, user=db_user, passwd=db_pass)
+    cursor = db.cursor()
+    query = "DELETE FROM Active_Users WHERE Cookie='" + session_id + "';"
+    cursor.execute(query)
+    db.commit()
+    count = cursor.rowcount
+    db.close()
+    if count:
+        return True
+    return False
+
+# Function to add an owner
+def add_owner() -> bool:
+    db = mysql.connect(host=db_host, database=db_name, user=db_user, passwd=db_pass)
+    cursor = db.cursor()
+
+    db.commit()
+    db.close()
+
 
 
 # ROUTES -------------------------------------------------------------------------------->
@@ -246,6 +255,14 @@ def get_home_html() -> HTMLResponse:
     with open("views/Home.html") as html:
         return HTMLResponse(content=html.read())
 
+@app.post("/home")
+def add_product(owner: Owner, request: Request):
+    Serial_Number = owner.Serial_Number
+    Product_Name = owner.Product_Name
+    Username = request.get("")
+    message = {"message", ""}
+
+    return message
 
 
 
