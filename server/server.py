@@ -216,6 +216,7 @@ def get_user_products(Username:str) -> list:
     db = mysql.connect(host=db_host, database=db_name, user=db_user, passwd=db_pass)
     cursor = db.cursor()
     cursor.execute("SELECT Serial, Product_Name FROM Owners WHERE Username=%s", (Username))
+    # Will be in the form results[rows][columns]
     results = cursor.fetchall()
     db.close()
 
@@ -332,7 +333,8 @@ def delete_ownership(data: dict) -> dict:
     success = unregister_product(Serial_number)
     if not success:
         message["message"] = "Failure"
-    message["message"] = "Success"
+    else:
+        message["message"] = "Success"
     return message
 
 @app.get("/home/products")
@@ -350,6 +352,8 @@ def get_products(request: Request) -> list:
 def get_product_html() -> HTMLResponse:
     with open("views/Product.html") as html:
         return HTMLResponse(content=html.read())
+
+
 
 if __name__ == '__main__':
     # Create a Process object and start the process
