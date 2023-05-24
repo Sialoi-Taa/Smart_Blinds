@@ -78,7 +78,6 @@ document.addEventListener("DOMContentLoaded", function() {
       document.body.appendChild(form)
       form1 = document.getElementById("Product-Registration");
       form1.addEventListener("submit", add_product, true);
-      console.log(form1);
     }
 
     // Function for adding a product to the list
@@ -93,25 +92,25 @@ document.addEventListener("DOMContentLoaded", function() {
       })
       add_button.hidden = false;
       document.body.removeChild(reg_form);
+      console.log(reg_form);
     }
 
     // DOCUMENT ELEMENT VARIABLES ------------------------------------------------------>
     var Greetings = document.getElementById("Intro");
     var Username = document.cookie["Username"];
     var Products = document.getElementById("Product-Container");
-    var Form_Container = document.getElementById("Form-Container");
     var add_button = document.getElementById("Add-Product");
+    var reg_form
 
     // EVENT LISTENERS ----------------------------------------------------------------->
     Greetings.innerHTML = `Greetings, ${Username}!`;
     add_button.addEventListener("click", function() {
       create_form();
       add_button.hidden = true;
-      var reg_form
       reg_form = document.getElementById("Product-Registration");
     })
 
-    // INTERVALE FUNCTIONS ----------------------------------------------------------------->
+    // INTERVAL FUNCTIONS ----------------------------------------------------------------->
     //setInterval(,10000)
 
     })

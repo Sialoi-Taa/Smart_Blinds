@@ -56,7 +56,7 @@ class Owner(BaseModel):
 
 # FUNCTIONS -------------------------------------------------------------------------------->
 # Function to find the existence of an email
-def find_email(Email):
+def find_email(Email:str):
     db = mysql.connect(host=db_host, database=db_name, user=db_user, passwd=db_pass)
     cursor = db.cursor()
     cursor.execute("USE Smart_Blinds;")
@@ -68,7 +68,7 @@ def find_email(Email):
     return True
 
 # Function to check a user's login info is correct
-def check_password(Email, Password):
+def check_password(Email:str, Password:str) -> bool:
     db = mysql.connect(host=db_host, database=db_name, user=db_user, passwd=db_pass)
     cursor = db.cursor()
     cursor.execute("SELECT Password FROM Users WHERE Email=%s", (str(Email)))
@@ -79,7 +79,7 @@ def check_password(Email, Password):
     return False
 
 # Function to find the existence of a username
-def find_username(Username):
+def find_username(Username:str) -> bool:
     db = mysql.connect(host=db_host, database=db_name, user=db_user, passwd=db_pass)
     cursor = db.cursor()
     cursor.execute("USE Smart_Blinds;")
@@ -91,7 +91,7 @@ def find_username(Username):
     return True
 
 # Function to create a new user in the database
-def create_user(Username, Password, Email):
+def create_user(Username:str, Password:str, Email:str):
     db = mysql.connect(host=db_host, database=db_name, user=db_user, passwd=db_pass)
     cursor = db.cursor()
     cursor.execute("USE Smart_Blinds;")
@@ -128,18 +128,18 @@ def create_session(response:Response, Email:str) -> str:
     return session_id
 
 # Function to check the existence of a session ID attached to a username and return what it finds
-def check_sessionID(Username: str):
+def check_sessionID(Username:str) -> str:
     db = mysql.connect(host=db_host, database=db_name, user=db_user, passwd=db_pass)
     cursor = db.cursor()
     cursor.execute("SELECT Cookie FROM Active_Users WHERE Username=%s", (Username))
     session_ID = cursor.fetchone()
     db.close()
     if session_ID is None:
-        return []
+        return ""
     return session_ID[0]
 
 # Function to use to see if a session should have expired
-def expired_session(session_ID):
+def expired_session(session_ID:str) -> bool:
     db = mysql.connect(host=db_host, database=db_name, user=db_user, passwd=db_pass)
     cursor = db.cursor()
     cursor.execute("SELECT created_at FROM Active_Users WHERE Cookie=%s", (session_ID))
@@ -157,8 +157,7 @@ def expired_session(session_ID):
 def end_session(session_id:str) -> bool:
     db = mysql.connect(host=db_host, database=db_name, user=db_user, passwd=db_pass)
     cursor = db.cursor()
-    query = "DELETE FROM Active_Users WHERE Cookie='" + session_id + "';"
-    cursor.execute(query)
+    cursor.execute("DELETE FROM Active_Users WHERE Cookie=%s;", (session_id))
     db.commit()
     count = cursor.rowcount
     db.close()
@@ -166,14 +165,64 @@ def end_session(session_id:str) -> bool:
         return True
     return False
 
+# Function to see if there's a valid serial number
+def delete_unregistered_serial(serial_number:str) -> bool:
+    db = mysql.connect(host=db_host, database=db_name, user=db_user, passwd=db_pass)
+    cursor = db.cursor()
+    cursor.execute("SELECT EXISTS(SELECT * FROM Unregistered WHERE Serial=%s);", (serial_number))
+    result = cursor.fetchall()
+    if result[0][0] == 1:
+        cursor.execute("DELETE FROM Unregistered WHERE Serial=%s;", (serial_number))
+        db.commit()
+        db.close()
+        return True
+    else:
+        db.close()
+        return False
+
 # Function to add an owner
-def add_owner() -> bool:
+def add_owner(username:str, product_name:str, serial_number:str) -> bool:
+    db = mysql.connect(host=db_host, database=db_name, user=db_user, passwd=db_pass)
+    cursor = db.cursor()
+    cursor.execute("INSERT INTO Owners (Username, Serial, Product_Name) VALUES (%s, %s, %s);", (username, product_name, serial_number))
+    db.commit()
+    count = cursor.rowcount()
+    db.close()
+    if count == 0:
+        return False
+    return True
+
+# Function to unregister a product
+def unregister_product(serial_number) -> bool:
     db = mysql.connect(host=db_host, database=db_name, user=db_user, passwd=db_pass)
     cursor = db.cursor()
 
+    # Delete the attachment between product and user
+    cursor.execute("DELETE FROM Owners WHERE Serial=%s;", (serial_number))
     db.commit()
+    count = cursor.rowcount()
+    if count == 0:
+        db.close()
+        return False
+    cursor.execute("INSERT INTO Unregistered (Serial) VALUES (%s);", (serial_number))
+    db.commit()
+    count = cursor.rowcount()
+    db.close()
+    if count == 0:
+        return False
+    return True
+
+def get_user_products(Username:str) -> list:
+    db = mysql.connect(host=db_host, database=db_name, user=db_user, passwd=db_pass)
+    cursor = db.cursor()
+    cursor.execute("SELECT Serial, Product_Name FROM Owners WHERE Username=%s", (Username))
+    results = cursor.fetchall()
     db.close()
 
+    # If there's no products under the user's name, then return nothing
+    if len(results) == 0:
+        return []
+    return results
 
 
 # ROUTES -------------------------------------------------------------------------------->
@@ -256,15 +305,42 @@ def get_home_html() -> HTMLResponse:
         return HTMLResponse(content=html.read())
 
 @app.post("/home")
-def add_product(owner: Owner, request: Request):
+def add_product(owner: Owner, request: Request) -> dict:
+    message = {"message", ""}
     Serial_Number = owner.Serial_Number
     Product_Name = owner.Product_Name
-    Username = request.get("")
-    message = {"message", ""}
+    Username = request.cookies.get("Username")
 
+    # Attempting to delete the serial number
+    success = delete_unregistered_serial(Serial_Number)
+    if not success:
+        message["message"] = "Serial number doesn't exist or is already owned"
+        return message
+    
+    # Serial number was deleted successfully and ready to be added to a user's account
+    success = add_owner(Username, Product_Name, Serial_Number)
+    if not success:
+        message["message"] = "Serial number was not added to the owner"
+        return message
+    message["message"] = "Success"
     return message
 
+@app.delete("/home")
+def delete_ownership(data: dict) -> dict:
+    message = {"message", ""}
+    Serial_number = data["Serial_Number"]
+    success = unregister_product(Serial_number)
+    if not success:
+        message["message"] = "Failure"
+    message["message"] = "Success"
+    return message
 
+@app.get("/home/products")
+def get_products(request: Request) -> list:
+    username = request.cookies.get("Username")
+    products = get_user_products(username)
+    return products
+        
 
 
 
