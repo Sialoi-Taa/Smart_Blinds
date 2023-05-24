@@ -27,6 +27,19 @@ In the login page, the user's input will be processed and see if we have any cre
 * The customization page will connect and change the Schedule and State tables accordingly and possibly add multiprocessing that will run on the server to follow the schedules.
 * Look at a way for a controller to stay connected to the internet and keep getting server updates for IoT.
 
+# NEED TO BE DONE
+* Make schematic - Sialoi
+* UI design - Taimur
+* UX design - Taimur
+* Information architecture - Sialoi and Taimur
+* Finalize all technical capabilities for components/hardware - Everyone
+* Collect components - Christian
+* Create the circuit - Sialoi
+* Create mock model - Christian
+* Assemble model - Christian
+* Debugging and testing - Sialoi and Taimur 
+* Prep live demonstration - Everyone
+
 # USEFUL LINKS
 https://stackoverflow.com/questions/10502645/serving-a-local-website-via-bluetooth-to-a-cellphone-without-using-the-internet
 
