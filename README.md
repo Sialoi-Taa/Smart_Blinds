@@ -26,4 +26,4 @@ You need to design a way for you to make the add button create an input form tha
 After the submit button is pressed, this information needs to be placed in the MySQL database under the *Owners* table and take the serial number off the *Unregistered* table.
 When that is done, let it be able to add a button to the product container that has the personal name on the button.
 If that button is pressed, then it'll take the user to that product's customization page
-The customization page will connect and change the Schedule and State tables accordingly and add multiprocessing that will run on the server to follow the scheduels.
+The customization page will connect and change the Schedule and State tables accordingly and add multiprocessing that will run on the server to follow the schedules.
