@@ -33,6 +33,7 @@ ___
 * UX design - Taimur
 * Information architecture - Sialoi and Taimur
 * Finalize all technical capabilities for components/hardware - Everyone
+* Make a general cost and profit model - Everyone?
 * Collect components - Christian
 * Create the circuit - Sialoi
 * Create mock model - Christian
