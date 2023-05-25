@@ -59,6 +59,7 @@ ___
 ## Visuals
 ![No Color Schematic](images/Schematic.jpg)
 ![Flow Described Schematic](images/Color_Guided_Schematic.jpg)
+![Program Created Schematic](images/Prototype_Circuit.png)
 
 ## Explanation
 Here's how the circuit works. First it's good to explain what each component is. The fuse circuit element is an component that is in place to protect the relay from any damage from too much current being passed through it. The fuse is designed to burnout and shutdown that part of the circuit if it detects too much current for the relay to handle. The relay is a voltage controlled switch that can be turned ON or OFF by placing 5V of DC on it. Next are the diodes which are there to control the flow of electricity. We need them there to control the overall flow of current and expectations that we've placed on the circuit. Lastly are the Pi and the resistors which have no need for explanation here.  
