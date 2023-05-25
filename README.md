@@ -18,7 +18,7 @@ In the login page, the user's input will be processed and see if we have any cre
 ### Back End Design Diagram - Sialoi
 ![Back End Design](images/BED.jpg)
 
-
+___
 # NOTES FOR NEXT TIME
 * You finished the landing, login, and registration page.
 * You're finishing the HTML and JS integration for the home page.
@@ -39,7 +39,8 @@ In the login page, the user's input will be processed and see if we have any cre
 * Assemble model - Christian
 * Debugging and testing - Sialoi and Taimur 
 * Prep live demonstration - Everyone
-
+  
+___
 # USEFUL LINKS
 https://stackoverflow.com/questions/10502645/serving-a-local-website-via-bluetooth-to-a-cellphone-without-using-the-internet - Taimur
 
@@ -47,8 +48,7 @@ https://www.diodes.com/assets/Datasheets/ds12019.pdf (1N4148 Diode) - Sialoi
 
 https://www.brightsparkelectrician.co.uk/knowledge-centre/sockets/which-fuse-do-i-use/#:~:text=The%20simple%20calculation%20is%20watts,or%20even%2013%20amp%20fuse. (How to use a fuse and pick one out) - Sialoi
 
-
-  
+___
 # SCHEMATIC - Sialoi
 ## Components
 1. 1N4148 Diode (6)
@@ -66,3 +66,5 @@ Here's how the circuit works. First it's good to explain what each component is.
 Now is time for the explanation for how the circuit will behave. Look at the multi-colored schematic. When focusing on the red line, we've chosen that the voltage source will have a negative on the left side and a positive on the right side. The positive side will have 3 ways to go: up, down or right. Up is blocked by a diode, down leads to a highly resistant but passable pathway to the negative of the voltage source, and right will lead to a fuse that will determine if the current is too much to a relay that will act as a switch for when we want the circuit to be complete or not, going into the smart blinds product that I've labeled as "Load". After going through the load, the current go up or left. Left is blocked by a diode but up allows for a slight voltage drop and then into possibly a resistor to control the current and leftover voltage. The purple pathway follows the same logic as the red but assumes that the voltage source will have the positive on the left side and the negative side on the right side.  
 
 Using the Pi, we'll be able to control the switches from afar.
+___
+## Information Architecture
