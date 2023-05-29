@@ -60,8 +60,8 @@ ___
 ## Components
 1. 1N4148 Diode (6)
 2. 200k Ohm Resistors (2)
-3. Fuse (2) # Need to find out the load current going through the circuit 
-4. Relay (2) # Need to find the working current. Look at the power (Watts) delivered by the charger, divide that by the volts (25V), add 10% to that value and you'll get the current that should be tolerated by the fuse and relay.
+3. Fuse (2) # Need to find out the load current going through the circuit. [Littlefuse Fuse, Cartridge, 100 mA, 5x20mm, Fast Act-0216.100HXP]()
+4. Relay (2) # Need to find the working current. Look at the power (Watts) delivered by the charger, divide that by the volts (25V), add 10% to that value and you'll get the current that should be tolerated by the fuse and relay. [Onyehn 1 Channel DC 3V Relay High Level Driver Module Optocoupler Relay Module Isolated Drive Control Board for Arduino]()
   
 ## Visuals
 ![No Color Schematic](images/Schematic.jpg)

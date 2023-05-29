@@ -128,15 +128,15 @@ def create_session(response:Response, Email:str) -> str:
     return session_id
 
 # Function to check the existence of a session ID attached to a username and return what it finds
-def check_sessionID(Username:str) -> str:
+def check_sessionID(Username:str, session_id:str) -> bool:
     db = mysql.connect(host=db_host, database=db_name, user=db_user, passwd=db_pass)
     cursor = db.cursor()
     cursor.execute("SELECT Cookie FROM Active_Users WHERE Username=%s", (Username))
     session_ID = cursor.fetchone()
     db.close()
-    if session_ID is None:
-        return ""
-    return session_ID[0]
+    if ((session_ID is None) or (session_ID is not session_id)):
+        return False
+    return True
 
 # Function to use to see if a session should have expired
 def expired_session(session_ID:str) -> bool:
@@ -240,9 +240,13 @@ def get_landing_html() -> HTMLResponse:
 def get_login_html(request: Request) -> HTMLResponse:
     session_ID = request.cookies.get('session_id')
     Username = request.cookies.get('Username')
-    table_session_ID = check_sessionID(Username)
+    if session_ID is None or Username is None:
+        with open("views/Login.html") as html:
+            return HTMLResponse(content=html.read())
 
-    if session_ID is not table_session_ID:
+    success = check_sessionID(Username, session_ID)
+
+    if not success:
         with open("views/Login.html") as html:
             return HTMLResponse(content=html.read())
     else:
@@ -344,6 +348,19 @@ def get_products(request: Request) -> list:
     return products
         
 
+@app.get("/sessions")
+def check_session(request: Request, response: Response) -> list:
+    session_id = request.cookies.get("session_id")
+    success = expired_session(session_id)
+    message = {"message": ""}
+    if(success):
+        message["message"] = "Session Expired"
+        end_session(session_id)
+        response
+    else:
+        message["message"] = "Session Active"
+    return message
+    
 
 
 

@@ -178,6 +178,16 @@ document.addEventListener("DOMContentLoaded", function() {
       load_buttons();
     }
 
+    function check_session() {
+      const url = "/sessions";
+      const verb = "get";
+      server_get(url, verb, (response) => {
+        if(response["message"] == "Session Expired") {
+          
+        }
+      });
+    }
+
     load_buttons();
 
     // DOCUMENT ELEMENT VARIABLES ------------------------------------------------------>
