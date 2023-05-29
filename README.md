@@ -49,6 +49,12 @@ https://www.diodes.com/assets/Datasheets/ds12019.pdf (1N4148 Diode) - Sialoi
 
 https://www.brightsparkelectrician.co.uk/knowledge-centre/sockets/which-fuse-do-i-use/#:~:text=The%20simple%20calculation%20is%20watts,or%20even%2013%20amp%20fuse. (How to use a fuse and pick one out) - Sialoi
 
+https://www.amazon.com/HiLetgo-Channel-optocoupler-Support-Trigger/dp/B00LW15A4W/ref=asc_df_B00LW15A4W/?tag=hyprod-20&linkCode=df0&hvadid=198090929431&hvpos=&hvnetw=g&hvrand=1857119024715381207&hvpone=&hvptwo=&hvqmt=&hvdev=c&hvdvcmdl=&hvlocint=&hvlocphy=9031300&hvtargid=pla-348614466893&psc=1 (Relay Component) - Sialoi
+
+https://byjus.com/question-answer/a-fuse-is-always-connected-in-the-live-wire-of-the-circuit-explain-the-reason/ (More fuse knowledge) - Sialoi
+
+
+
 ___
 # SCHEMATIC - Sialoi
 ## Components
