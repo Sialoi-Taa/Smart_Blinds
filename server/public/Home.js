@@ -179,15 +179,20 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     function check_session() {
-      const url = "/sessions";
+      const url = "/session";
       const verb = "get";
       server_get(url, verb, (response) => {
-        if(response["message"] == "Session Expired") {
-          
+        message = response["message"];
+        if(message == "Session doesn't exist") {
+          alert("Session doesn't exist, please log back in with valid credentials!");
+          location.replace("/login");
+        } else if(message == "Session Expired") {
+          alert("Your session has expired! Please log back in with valid credentials.");
+          location.replace("/login");
         }
-      });
+      })
     }
-
+    check_session();
     load_buttons();
 
     // DOCUMENT ELEMENT VARIABLES ------------------------------------------------------>
@@ -213,6 +218,9 @@ document.addEventListener("DOMContentLoaded", function() {
       delete_form();
     })
     // INTERVAL FUNCTIONS ----------------------------------------------------------------->
-    //setInterval(,10000)
+    // Runs every minute
+    setInterval(function() {
+      check_session();
+    },60000);
 
     })

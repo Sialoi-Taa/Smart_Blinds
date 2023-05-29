@@ -351,15 +351,16 @@ def get_products(request: Request) -> list:
 @app.get("/sessions")
 def check_session(request: Request, response: Response) -> list:
     session_id = request.cookies.get("session_id")
-    success = expired_session(session_id)
-    response.delete_cookie
-    response.set_cookie(key="session_id", value=, max_age=900)
-    response.set_cookie(key="Username", value=username, max_age=900)
+    username = request.cookies.get("Username")
     message = {"message": ""}
+    if((session_id is None or username is None)):
+        message["message"] = "Session doesn't exist"
+    success = expired_session(session_id, username)
     if(success):
         message["message"] = "Session Expired"
         end_session(session_id)
-        response
+        response.delete_cookie(key="session_id")
+        response.delete_cookie(key="Username")
     else:
         message["message"] = "Session Active"
     return message
