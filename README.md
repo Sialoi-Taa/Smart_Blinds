@@ -76,3 +76,8 @@ Now is time for the explanation for how the circuit will behave. Look at the mul
 Using the Pi, we'll be able to control the switches from afar.
 ___
 ## Information Architecture
+
+# TODO LIST
+* Add functionality for the add_button on the product page
+* Make a schedule loading function
+* Add cookie expiration to the product page

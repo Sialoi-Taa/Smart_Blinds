@@ -225,6 +225,35 @@ def get_user_products(Username:str) -> list:
         return []
     return results
 
+def check_state(Username:str, product_name:str) -> bool:
+    db = mysql.connect(host=db_host, database=db_name, user=db_user, passwd=db_pass)
+    cursor = db.cursor()
+    cursor.execute("SELECT Serial FROM Owners WHERE Username=%s AND Product_Name=%s", (Username, product_name))
+    serial = cursor.fetchone()[0]
+    cursor.execute("SELECT State FROM State WHERE Serial=%s", (serial))
+    state = cursor.fetchone()[0]
+    db.close()
+    if state:
+        return True
+    return False
+
+def update_state(Username:str, product_name:str, state:int) -> bool:
+    if state is 1:
+        state = 0
+    else:
+        state = 1
+    db = mysql.connect(host=db_host, database=db_name, user=db_user, passwd=db_pass)
+    cursor = db.cursor()
+    cursor.execute("SELECT Serial FROM Owners WHERE Username=%s AND Product_Name=%s", (Username, product_name))
+    serial = cursor.fetchone()[0]
+    cursor.execute("UPDATE State SET State=%d WHERE Serial=%s", (state, serial))
+    db.commit()
+    db.close()
+    if state:
+        return True
+    else:
+        return False
+
 
 # ROUTES -------------------------------------------------------------------------------->
 # Example route: return the landing HTML page
@@ -374,7 +403,34 @@ def get_product_html() -> HTMLResponse:
     with open("views/Product.html") as html:
         return HTMLResponse(content=html.read())
 
+@app.get("/state")
+def check_state(request: Request) -> list:
+    message = {"message": ""}
+    Username = request.cookies.get("Username")
+    Product_Name = request.cookies.get("Product_Name")
+    success = check_state(Username, Product_Name)
+    if success:
+        message["message"] = "ON"
+    else:
+        message["message"] = "OFF"
+    return message
 
+@app.put("/state")
+def update_the_state(request: Request) -> list:
+    message = {"message": ""}
+    state = request["state"]
+    Username = request.cookies.get("Username")
+    Product_Name = request.cookies.get("Product_Name")
+    if state is "ON":
+        state = 1
+    else:
+        state = 0
+    success = update_state(Username, Product_Name, state)
+    if success:
+        message["message"] = "ON"
+    else:
+        message["message"] = "OFF"
+    return message
 
 if __name__ == '__main__':
     # Create a Process object and start the process

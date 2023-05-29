@@ -82,8 +82,9 @@ document.addEventListener("DOMContentLoaded", function() {
 
     // Function for loading in product buttons
     function load_buttons() {
-      const url = "/home/products"
-      const verb = "get"
+      Products.innerHTML = "";
+      const url = "/home/products";
+      const verb = "get";
       server_get(url, verb, (response) => {
         if(response.length > 0) {
           Products.hidden = false;
