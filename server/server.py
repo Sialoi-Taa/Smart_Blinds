@@ -352,6 +352,9 @@ def get_products(request: Request) -> list:
 def check_session(request: Request, response: Response) -> list:
     session_id = request.cookies.get("session_id")
     success = expired_session(session_id)
+    response.delete_cookie
+    response.set_cookie(key="session_id", value=, max_age=900)
+    response.set_cookie(key="Username", value=username, max_age=900)
     message = {"message": ""}
     if(success):
         message["message"] = "Session Expired"
