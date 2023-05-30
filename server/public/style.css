@@ -1,0 +1,100 @@
+/* General settings */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #F5F5F5;
+}
+
+/* Header */
+#Intro {
+    padding: 20px;
+    background-color: #212121;
+    color: #FFFFFF;
+    text-align: center;
+    font-size: 1.5em;
+    font-weight: bold;
+}
+
+/* Product Container */
+#Product-Container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin: 20px;
+}
+
+#Product-Container button {
+    margin: 10px;
+    padding: 10px;
+    background-color: #4CAF50;
+    border: none;
+    color: white;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    transition-duration: 0.4s;
+    cursor: pointer;
+}
+
+#Product-Container button:hover {
+    background-color: white;
+    color: #4CAF50;
+}
+
+/* Add and Delete Product Buttons */
+#Add-Product, #Delete-Product {
+    display: block;
+    margin: 10px auto;
+    padding: 15px;
+    background-color: #008CBA;
+    border: none;
+    color: white;
+    text-align: center;
+    text-decoration: none;
+    font-size: 18px;
+    transition-duration: 0.4s;
+    cursor: pointer;
+}
+
+#Add-Product:hover, #Delete-Product:hover {
+    background-color: white;
+    color: #008CBA;
+}
+
+/* Form styling */
+form {
+    margin: 20px;
+}
+
+form label {
+    display: block;
+    margin: 10px 0;
+}
+
+form input[type="text"] {
+    padding: 10px;
+    width: 100%;
+    box-sizing: border-box;
+    margin-bottom: 20px;
+}
+
+form input[type="submit"] {
+    display: block;
+    margin: 20px auto;
+    padding: 15px;
+    background-color: #f44336;
+    border: none;
+    color: white;
+    text-align: center;
+    text-decoration: none;
+    font-size: 18px;
+    transition-duration: 0.4s;
+    cursor: pointer;
+}
+
+form input[type="submit"]:hover {
+    background-color: white;
+    color: #f44336;
+}
