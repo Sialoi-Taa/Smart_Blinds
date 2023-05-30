@@ -58,8 +58,8 @@ https://byjus.com/question-answer/a-fuse-is-always-connected-in-the-live-wire-of
 ___
 # SCHEMATIC - Sialoi
 ## Components
-1. 1N4148 Diode (6)
-2. 200k Ohm Resistors (2)
+1. 1N4148 Diode (6) [Makerspace on campus]
+2. 200k Ohm Resistors (2) [Makerspace on campus]
 3. Fuse (2) # Need to find out the load current going through the circuit. [Techman - Pack of 5-100mA (0.1A) Glass Fuse (GMA), 250v, 5mm x 20mm (3/16" X 3/4") Fast Blow (Fast Acting)](https://www.amazon.com/gp/product/B074KMJHJS/ref=ewc_pr_img_1?smid=AUL3C4WVGKX82&psc=1)
 4. Relay (2) # Need to find the working current. Look at the power (Watts) delivered by the charger, divide that by the volts (25V), add 10% to that value and you'll get the current that should be tolerated by the fuse and relay. [Songhe DC 1 Channel Optocoupler 3V/3.3V Relay High Level Driver Module Isolated Drive Control Board 3V/3.3V Relay Module for Arduino (Pack of 5)](https://www.amazon.com/gp/product/B07XGZSYJV/ref=ewc_pr_img_1?smid=A38CU2XC1RY0BO&psc=1)
   
