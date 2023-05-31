@@ -32,11 +32,11 @@ ___
 * UI design - Taimur
 * UX design - Taimur
 * Information architecture - Sialoi and Taimur
-* Finalize all technical capabilities for components/hardware - Everyone
+* ~~Finalize all technical capabilities for components/hardware~~ - Everyone
 * Make a general cost and profit model - Everyone?
-* Collect components - Christian
+* ~~Collect components~~ - Christian
 * Create the circuit - Sialoi
-* Create mock model - Christian
+* ~~Create mock model~~ - Christian
 * Assemble model - Christian
 * Debugging and testing - Sialoi and Taimur 
 * Prep live demonstration - Everyone
