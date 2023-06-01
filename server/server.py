@@ -51,11 +51,20 @@ class Owner(BaseModel):
     Serial_Number: str
     Product_Name: str
 
-
+GpioPins = [26, 18]
 
 
 # FUNCTIONS -------------------------------------------------------------------------------->
 # Function to find the existence of an email
+
+# The setup function
+def setup():
+    # Sets the board GPIO
+    GPIO.setmode(GPIO.BCM)
+    # Set up the relay switch pins
+    for pin in GpioPins:
+        GPIO.setup(pin,GPIO.OUT)
+    
 def find_email(Email:str):
     db = mysql.connect(host=db_host, database=db_name, user=db_user, passwd=db_pass)
     cursor = db.cursor()
@@ -212,6 +221,7 @@ def unregister_product(serial_number) -> bool:
         return False
     return True
 
+# A function for getting all of the products under a user's account
 def get_user_products(Username:str) -> list:
     db = mysql.connect(host=db_host, database=db_name, user=db_user, passwd=db_pass)
     cursor = db.cursor()
@@ -225,6 +235,7 @@ def get_user_products(Username:str) -> list:
         return []
     return results
 
+# A function for checking the state of a product in the MySQL tables
 def check_state(Username:str, product_name:str) -> bool:
     db = mysql.connect(host=db_host, database=db_name, user=db_user, passwd=db_pass)
     cursor = db.cursor()
@@ -237,6 +248,7 @@ def check_state(Username:str, product_name:str) -> bool:
         return True
     return False
 
+# A function updating the state of a product in the MySQL tables
 def update_state(Username:str, product_name:str, state:int) -> bool:
     if state is 1:
         state = 0
@@ -256,7 +268,7 @@ def update_state(Username:str, product_name:str, state:int) -> bool:
 
 
 # ROUTES -------------------------------------------------------------------------------->
-# Example route: return the landing HTML page
+# A route to the landing page
 @app.get("/", response_class=HTMLResponse)
 def get_landing_html() -> HTMLResponse:
     with open("views/Landing_Page.html") as html:
@@ -264,7 +276,7 @@ def get_landing_html() -> HTMLResponse:
 
 
 
-# Example route: return the login HTML page
+# A route for leading the user to a home page if they have a session ID already or the login HTML page
 @app.get("/login", response_class=HTMLResponse)
 def get_login_html(request: Request) -> HTMLResponse:
     session_ID = request.cookies.get('session_id')
@@ -282,6 +294,7 @@ def get_login_html(request: Request) -> HTMLResponse:
         with open("views/Home.html") as html:
             return HTMLResponse(content=html.read())
 
+# A route for processing the user's login information
 @app.put("/login")
 def verify_login(login: Login, response: Response) -> dict:
     message = {"message": ""}
@@ -298,12 +311,13 @@ def verify_login(login: Login, response: Response) -> dict:
 
 
 
-# Example route: return the register HTML page
+# A route for giving the user the registration HTML page
 @app.get("/register", response_class=HTMLResponse)
 def get_register_html() -> HTMLResponse:
     with open("views/Register.html") as html:
         return HTMLResponse(content=html.read())
 
+# A route that processes the user's registration data
 @app.post("/register")
 def register_user(registration: Registration) -> dict:
     # First check to see if the email is in use already
@@ -332,12 +346,13 @@ def register_user(registration: Registration) -> dict:
 
 
 
-# Example route: return the homepage HTML page
+# A route for getting the HTML page for the user's home page and their list of products
 @app.get("/home", response_class=HTMLResponse)
 def get_home_html() -> HTMLResponse:
     with open("views/Home.html") as html:
         return HTMLResponse(content=html.read())
 
+# A route for attaching a product to a user's account
 @app.post("/home")
 def add_product(owner: Owner, request: Request) -> dict:
     message = {"message", ""}
@@ -359,6 +374,7 @@ def add_product(owner: Owner, request: Request) -> dict:
     message["message"] = "Success"
     return message
 
+# A route to unattach a product from a user's account
 @app.delete("/home")
 def delete_ownership(data: dict) -> dict:
     message = {"message", ""}
@@ -370,13 +386,14 @@ def delete_ownership(data: dict) -> dict:
         message["message"] = "Success"
     return message
 
+# A route for getting all of the products under a specfic username
 @app.get("/home/products")
 def get_products(request: Request) -> list:
     username = request.cookies.get("Username")
     products = get_user_products(username)
     return products
         
-
+# A route to check if a session is active, expired, or doesn't exist
 @app.get("/sessions")
 def check_session(request: Request, response: Response) -> list:
     session_id = request.cookies.get("session_id")
@@ -397,12 +414,13 @@ def check_session(request: Request, response: Response) -> list:
 
 
 
-# Example route: return the specifc product HTML page
+# A route to the product specific page
 @app.get("/product", response_class=HTMLResponse)
 def get_product_html() -> HTMLResponse:
     with open("views/Product.html") as html:
         return HTMLResponse(content=html.read())
 
+# A route for getting the current state of the blinds
 @app.get("/state")
 def check_state(request: Request) -> list:
     message = {"message": ""}
@@ -415,6 +433,7 @@ def check_state(request: Request) -> list:
         message["message"] = "OFF"
     return message
 
+# A route for updating the state of the Smart Blinds
 @app.put("/state")
 def update_the_state(request: Request) -> list:
     message = {"message": ""}
@@ -428,8 +447,12 @@ def update_the_state(request: Request) -> list:
     success = update_state(Username, Product_Name, state)
     if success:
         message["message"] = "ON"
+        for pin in GpioPins:
+            GPIO.output(pin,GPIO.LOW)
     else:
         message["message"] = "OFF"
+        for pin in GpioPins:
+            GPIO.output(pin,GPIO.LOW)
     return message
 
 if __name__ == '__main__':
@@ -437,4 +460,5 @@ if __name__ == '__main__':
     #setup()
     #my_process = multiprocessing.Process(target=log_sensors)
     #my_process.start()
+    setup()
     uvicorn.run(app, host='0.0.0.0', port=8000)

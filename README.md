@@ -35,7 +35,7 @@ ___
 * ~~Finalize all technical capabilities for components/hardware~~ - Everyone
 * Make a general cost and profit model - Everyone?
 * ~~Collect components~~ - Christian
-* Create the circuit - Sialoi
+* ~~Create the circuit~~ - Sialoi
 * ~~Create mock model~~ - Christian
 * Assemble model - Christian
 * Debugging and testing - Sialoi and Taimur 
