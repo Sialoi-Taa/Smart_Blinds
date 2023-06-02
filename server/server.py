@@ -23,6 +23,18 @@ import multiprocessing
 import bcrypt, secrets 
 from pydantic import BaseModel
 
+
+
+
+
+
+
+
+
+
+
+
+
 # VARIABLE INITIALIZATION -------------------------------------------------------------------------------->
 ''' Environment Variables '''
 load_dotenv("credentials.env")
@@ -57,6 +69,18 @@ class Schedule(BaseModel):
     State: str
 
 GpioPins = [26, 18]
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 # FUNCTIONS -------------------------------------------------------------------------------->
@@ -305,12 +329,32 @@ def load_schedules(Serial:str) -> list:
         return []
     return results
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # ROUTES -------------------------------------------------------------------------------->
 # A route to the landing page
 @app.get("/", response_class=HTMLResponse)
 def get_landing_html() -> HTMLResponse:
     with open("views/Landing_Page.html") as html:
         return HTMLResponse(content=html.read())
+
+
+
 
 
 
@@ -349,6 +393,9 @@ def verify_login(login: Login, response: Response) -> dict:
 
 
 
+
+
+
 # A route for giving the user the registration HTML page
 @app.get("/register", response_class=HTMLResponse)
 def get_register_html() -> HTMLResponse:
@@ -381,6 +428,11 @@ def register_user(registration: Registration) -> dict:
     create_user(Username, password, Email)
     message = {"message": "Succeess"}
     return message
+
+
+
+
+
 
 
 
@@ -452,6 +504,10 @@ def check_session(request: Request, response: Response) -> list:
 
 
 
+
+
+
+
 # A route to the product specific page
 @app.get("/product", response_class=HTMLResponse)
 def get_product_html() -> HTMLResponse:
@@ -520,6 +576,17 @@ def add_schedule_html(schedule: Schedule, request: Request) -> dict:
     else:
         message["message"] = "Schedule not added"
     return message
+
+
+
+
+
+
+
+
+
+
+
 
 
 
