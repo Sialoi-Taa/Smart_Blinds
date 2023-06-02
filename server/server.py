@@ -142,7 +142,7 @@ def create_user(Username:str, Password:str, Email:str):
     db = mysql.connect(host=db_host, database=db_name, user=db_user, passwd=db_pass)
     cursor = db.cursor()
     cursor.execute("USE Smart_Blinds;")
-    cursor.execute("INSERT INTO Users (Username, Password, Email, created_at) VALUES (%s, %s, %s)", (Username, Password, Email))
+    cursor.execute("INSERT INTO Users (Username, Password, Email) VALUES (%s, %s, %s)", (Username, Password, Email))
     db.commit()
     db.close()
 
@@ -153,12 +153,12 @@ def create_session(response:Response, Email:str) -> str:
     # Connect to mysql
     db = mysql.connect(host=db_host, database=db_name, user=db_user, passwd=db_pass)
     cursor = db.cursor()
-    cursor.execute("SELECT Username FROM Users WHERE Email=%s", (Email))
+    cursor.execute("SELECT Username FROM Users WHERE Email=%s", (str(Email)))
     username = cursor.fetchone()[0]
     # Delete the previous session for that username
-    cursor.execute("DELETE FROM Active_Users WHERE Username=%s;", (username))
+    cursor.execute("DELETE FROM Active_Users WHERE Username=%s;", (str(username)))
     # Insert a new session for that specific user
-    cursor.execute("INSERT INTO Active_Users (Username, Cookie, created_at) VALUES (%s, %s, %s);", (username, session_id, datetime.datetime.now()))
+    cursor.execute("INSERT INTO Active_Users (Username, Cookie, created_at) VALUES (%s, %s, %s);", (str(username), str(session_id), str(datetime.datetime.now())))
     # Commit to the database
     db.commit()
     # Count how many rows are affected
