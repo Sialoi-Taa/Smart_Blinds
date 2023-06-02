@@ -170,7 +170,7 @@ def create_session(response:Response, Email:str) -> str:
         return ""
     # Give the client a cookie with the session ID
     response.set_cookie(key="session_id", value=session_id, max_age=900)
-    response.set_cookie(key="Username", value=username, max_age=900)
+    response.set_cookie(key="Username", value=username)
     # Return the session ID as a string
     return session_id
 
