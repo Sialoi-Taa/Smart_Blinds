@@ -219,9 +219,8 @@ document.addEventListener("DOMContentLoaded", function() {
       delete_form();
     })
     // INTERVAL FUNCTIONS ----------------------------------------------------------------->
-    // Runs every minute
+    // Runs every minute to check for session ID expiration
     setInterval(function() {
       check_session();
     },60000);
-
     })

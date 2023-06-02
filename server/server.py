@@ -51,6 +51,11 @@ class Owner(BaseModel):
     Serial_Number: str
     Product_Name: str
 
+class Schedule(BaseModel):
+    Start_Time: str
+    End_Time: str
+    State: str
+
 GpioPins = [26, 18]
 
 
@@ -98,6 +103,15 @@ def find_username(Username:str) -> bool:
     if result is None:
         return False
     return True
+
+def return_serial(Username:str, Product_Name:str) -> str:
+    db = mysql.connect(host=db_host, database=db_name, user=db_user, passwd=db_pass)
+    cursor = db.cursor()
+    cursor.execute("USE Smart_Blinds;")
+    cursor.execute("SELECT Serial FROM Users WHERE Username=%s AND Product_Name=%s", (str(Username), str(Product_Name)))
+    result = cursor.fetchone()[0]
+    db.close()
+    return result
 
 # Function to create a new user in the database
 def create_user(Username:str, Password:str, Email:str):
@@ -266,6 +280,30 @@ def update_state(Username:str, product_name:str, state:int) -> bool:
     else:
         return False
 
+def add_schedule(start_time, end_time, state, serial) -> bool:
+    db = mysql.connect(host=db_host, database=db_name, user=db_user, passwd=db_pass)
+    cursor = db.cursor()
+    cursor.execute("INSERT INTO Schedule (Serial, Start_Time, End_Time, State) VALUES (%s, %s, %s, %s)", (serial, start_time, end_time, state))
+    db.commit()
+    count = cursor.rowcount
+    db.close()
+    if count:
+        return True
+    return False
+
+# A function for getting all of the products under a user's account
+def load_schedules(Serial:str) -> list:
+    db = mysql.connect(host=db_host, database=db_name, user=db_user, passwd=db_pass)
+    cursor = db.cursor()
+    cursor.execute("SELECT Start_Time, End_Time, State FROM Schedule WHERE Serial=%s", (Serial))
+    # Will be in the form results[rows][columns]
+    results = cursor.fetchall()
+    db.close()
+
+    # If there's no products under the user's name, then return nothing
+    if len(results) == 0:
+        return []
+    return results
 
 # ROUTES -------------------------------------------------------------------------------->
 # A route to the landing page
@@ -420,6 +458,17 @@ def get_product_html() -> HTMLResponse:
     with open("views/Product.html") as html:
         return HTMLResponse(content=html.read())
 
+# A route to get all of the schedules assigned to one product
+@app.get("/schedule")
+def check_state(request: Request) -> list:
+    Username = request.cookies.get("Username")
+    Product_Name = request.cookies.get("Product_Name")
+    serial = return_serial(Username, Product_Name)
+    schedules = load_schedules(serial)
+    # [row][start_time, end_time, state]
+    return schedules
+    
+
 # A route for getting the current state of the blinds
 @app.get("/state")
 def check_state(request: Request) -> list:
@@ -448,12 +497,31 @@ def update_the_state(request: Request) -> list:
     if success:
         message["message"] = "ON"
         for pin in GpioPins:
-            GPIO.output(pin,GPIO.LOW)
+            GPIO.output(pin,GPIO.HIGH)
     else:
         message["message"] = "OFF"
         for pin in GpioPins:
             GPIO.output(pin,GPIO.LOW)
     return message
+
+# A route for getting the current state of the blinds
+@app.post("/schedule")
+def add_schedule_html(schedule: Schedule, request: Request) -> dict:
+    message = {"message": ""}
+    start_time = schedule.Start_Time
+    end_time = schedule.End_Time
+    state = schedule.State
+    Username = request.cookies.get("Username")
+    Product_Name = request.cookies.get("Product_Name")
+    serial = return_serial(Username, Product_Name)
+    success = add_schedule(start_time, end_time, state, serial)
+    if success:
+        message["message"] = "Schedule Added"
+    else:
+        message["message"] = "Schedule not added"
+    return message
+
+
 
 if __name__ == '__main__':
     # Create a Process object and start the process
