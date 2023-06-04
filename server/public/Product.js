@@ -72,7 +72,7 @@ document.addEventListener("DOMContentLoaded", function() {
         Write_Button();
 
         // Writes the state of the button on the HTML page
-        function State_Button() {
+        function Change_State_Button() {
           // Will take the current state of the button, send it to the server,
           // store the switched state in a table, change the state in the hardware 
           // and return the new current state to be written for the user.
@@ -197,7 +197,7 @@ document.addEventListener("DOMContentLoaded", function() {
     // EVENT LISTENERS ----------------------------------------------------------------->
         Title.innerHTML = `${Product_Name}`;
 
-        State_Button.addEventListener("click", State_Button);
+        State_Button.addEventListener("click", Change_State_Button);
         Add_Button.addEventListener("click", add_button_functionality);
 
 

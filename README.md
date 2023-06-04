@@ -31,7 +31,7 @@ ___
 * ~~Make schematic~~ - Sialoi
 * UI design - Taimur
 * UX design - Taimur
-* Information architecture - Sialoi and Taimur
+* ~~Information architecture~~ - Sialoi and Taimur
 * ~~Finalize all technical capabilities for components/hardware~~ - Everyone
 * Make a general cost and profit model - Everyone?
 * ~~Collect components~~ - Christian
@@ -76,7 +76,10 @@ Now is time for the explanation for how the circuit will behave. Look at the mul
 Using the Pi, we'll be able to control the switches from afar.
 ___
 ## Information Architecture
-
+Below is the information architecture for Smart Blinds front and back end design integration. It will show what decisions are possible for the user and how each of those options will be interacting with the MySQL tables in the specified database.   
+![Information Architecture](images/Smart_Blinds_Information_Architecture.png)  
+Click link for more a closer https://mockittapp.wondershare.com/flow/Gmr5MJvBrvmftlizHHd4vP
+___
 # TODO LIST
 * Add functionality for the add_button on the product page
 * Make a schedule loading function

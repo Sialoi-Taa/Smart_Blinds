@@ -128,11 +128,12 @@ def find_username(Username:str) -> bool:
         return False
     return True
 
+# Function to find the serial in the Owners table through product name and username 
 def return_serial(Username:str, Product_Name:str) -> str:
     db = mysql.connect(host=db_host, database=db_name, user=db_user, passwd=db_pass)
     cursor = db.cursor()
     cursor.execute("USE Smart_Blinds;")
-    cursor.execute("SELECT Serial FROM Users WHERE Username=%s AND Product_Name=%s", (str(Username), str(Product_Name)))
+    cursor.execute("SELECT Serial FROM Owners WHERE Username=%s AND Product_Name=%s", (str(Username), str(Product_Name)))
     result = cursor.fetchone()[0]
     db.close()
     return result
@@ -212,7 +213,7 @@ def end_session(session_id:str) -> bool:
         return True
     return False
 
-# Function to see if there's a valid serial number
+# Function to delete a serial from the unregistered table
 def delete_unregistered_serial(serial_number:str) -> bool:
     db = mysql.connect(host=db_host, database=db_name, user=db_user, passwd=db_pass)
     cursor = db.cursor()
