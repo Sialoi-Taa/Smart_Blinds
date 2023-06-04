@@ -31,14 +31,15 @@ ___
 * ~~Make schematic~~ - Sialoi
 * UI design - Taimur
 * UX design - Taimur
-* ~~Information architecture~~ - Sialoi and Taimur
-* ~~Finalize all technical capabilities for components/hardware~~ - Everyone
-* Make a general cost and profit model - Everyone?
+* ~~Information architecture~~ - Sialoi
+* ~~Finalize all technical capabilities for components/hardware~~ - Sialoi
+* Make a general cost and profit model - Taimur
+* Make a poster - Taimur
 * ~~Collect components~~ - Christian
 * ~~Create the circuit~~ - Sialoi
 * ~~Create mock model~~ - Christian
 * Assemble model - Christian
-* Debugging and testing - Sialoi and Taimur 
+* Debugging and testing - Sialoi
 * Prep live demonstration - Everyone
   
 ___
@@ -58,8 +59,8 @@ https://byjus.com/question-answer/a-fuse-is-always-connected-in-the-live-wire-of
 ___
 # SCHEMATIC - Sialoi
 ## Components
-1. 1N4148 Diode (6) [Makerspace on campus]
-2. 200k Ohm Resistors (2) [Makerspace on campus]
+1. 1N4148 Diode (6) [uxcell® 20 Pcs 1N4148 DO-35 Fast Switching Signal Diodes 100V 500mA](https://www.amazon.com/dp/B0173B5G8E?psc=1&ref=ppx_yo2ov_dt_b_product_details)
+2. 1M Ohm Resistors (2) [Makerspace on campus]
 3. Fuse (2) # Need to find out the load current going through the circuit. [Techman - Pack of 5-100mA (0.1A) Glass Fuse (GMA), 250v, 5mm x 20mm (3/16" X 3/4") Fast Blow (Fast Acting)](https://www.amazon.com/gp/product/B074KMJHJS/ref=ewc_pr_img_1?smid=AUL3C4WVGKX82&psc=1)
 4. Relay (2) # Need to find the working current. Look at the power (Watts) delivered by the charger, divide that by the volts (25V), add 10% to that value and you'll get the current that should be tolerated by the fuse and relay. [Songhe DC 1 Channel Optocoupler 3V/3.3V Relay High Level Driver Module Isolated Drive Control Board 3V/3.3V Relay Module for Arduino (Pack of 5)](https://www.amazon.com/gp/product/B07XGZSYJV/ref=ewc_pr_img_1?smid=A38CU2XC1RY0BO&psc=1)
   
@@ -75,13 +76,11 @@ Now is time for the explanation for how the circuit will behave. Look at the mul
 
 Using the Pi, we'll be able to control the switches from afar.
 ___
-## Information Architecture
+## Information Architecture - Sialoi
 Below is the information architecture for Smart Blinds front and back end design integration. It will show what decisions are possible for the user and how each of those options will be interacting with the MySQL tables in the specified database.   
 ![Information Architecture](images/Smart_Blinds_Information_Architecture.png)  
 Click link for more a closer https://mockittapp.wondershare.com/flow/Gmr5MJvBrvmftlizHHd4vP
 ___
 # TODO LIST
-* Add functionality for the add_button on the product page
-* Make a schedule loading function
-* Add cookie expiration to the product page
-https://mockitt.wondershare.com/404.html
+- Run tests on the product
+- Figure out the IoT component
