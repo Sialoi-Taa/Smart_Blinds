@@ -22,8 +22,9 @@ from RpiMotorLib import RpiMotorLib
 import multiprocessing
 import bcrypt, secrets 
 from pydantic import BaseModel
-
-
+from urllib.request import urlopen
+import json
+import string
 
 
 
@@ -68,8 +69,6 @@ class Schedule(BaseModel):
     End_Time: str
     State: str
 
-GpioPins = [26, 18]
-
 
 
 
@@ -84,16 +83,8 @@ GpioPins = [26, 18]
 
 
 # FUNCTIONS -------------------------------------------------------------------------------->
-# Function to find the existence of an email
 
-# The setup function
-def setup():
-    # Sets the board GPIO
-    GPIO.setmode(GPIO.BCM)
-    # Set up the relay switch pins
-    for pin in GpioPins:
-        GPIO.setup(pin,GPIO.OUT)
-    
+# Function to find the existence of an email
 def find_email(Email:str):
     db = mysql.connect(host=db_host, database=db_name, user=db_user, passwd=db_pass)
     cursor = db.cursor()
@@ -582,6 +573,23 @@ def add_schedule_html(schedule: Schedule, request: Request) -> dict:
 
 
 
+# Routes for the stock dictionaries.
+@app.get("/data/{product}")
+def get_json(product:str) -> dict:
+    message = {"message": ""}
+    
+
+@app.get("/state")
+def check_state(request: Request) -> list:
+    message = {"message": ""}
+    Username = request.cookies.get("Username")
+    Product_Name = request.cookies.get("Product_Name")
+    success = check_state(Username, Product_Name)
+    if success:
+        message["message"] = "ON"
+    else:
+        message["message"] = "OFF"
+    return message
 
 
 
@@ -596,5 +604,4 @@ if __name__ == '__main__':
     #setup()
     #my_process = multiprocessing.Process(target=log_sensors)
     #my_process.start()
-    setup()
     uvicorn.run(app, host='0.0.0.0', port=8000)
