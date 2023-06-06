@@ -76,11 +76,17 @@ Now is time for the explanation for how the circuit will behave. Look at the mul
 
 Using the Pi, we'll be able to control the switches from afar.
 ___
-## Information Architecture - Sialoi
+# Information Architecture - Sialoi
 Below is the information architecture for Smart Blinds front and back end design integration. It will show what decisions are possible for the user and how each of those options will be interacting with the MySQL tables in the specified database.   
 ![Information Architecture](images/Smart_Blinds_Information_Architecture.png)  
 Click link for more a closer https://mockittapp.wondershare.com/flow/Gmr5MJvBrvmftlizHHd4vP
 ___
-# TODO LIST
-- Run tests on the product
-- Figure out the IoT component
+# IoT Component - Sialoi
+![IoT Component Graphic](images/IoT_Component.png)   
+In this graphic, you can see that the way our IoT component works is that for this demonstration my laptop will act as the host server. Every product will have a Raspberry Pi that will first act as an access point for the user. When the user connects to the 'Smart_Blinds' network, they will be prompted to place their network information for the Pi to be connected to internet. After successful connection to the internet, the Pi will make routine fetches to specific routes that will be received by the server and will be given back a dictionary of information. This information will tell the Pi whether it should be ON or OFF right now. To prevent any type of hacking over this public server, the route will only give back whether the product should be ON or OFF at the moment. Nothing private should be shared inside the information being sent back to the Pi!   
+
+The main way for the user to be able to access this product is through the site, and they will be able to make new schedules and also toggle the state of their Smart Blinds product. In the graphic, it shows a women accessing her blinds from her laptop outside. This is an example of how the signed in user will be able to manage their blinds' settings from anywhere in the world as long as the server on the hosting machine is up and running
+___
+# Marketing Scheme - Sialoi
+For the marketing scheme, we had the idea of making the blinds come with the scheduling and toggle feature. After that, we sell packages of extra customizable features that the user could pay for. These features will have different prices and subscription models. An example of this is that we could have a feature that will tell how many times you toggle the state of the blinds and make a model to automatically control the Smart Blinds during all times of the day. This would be a subscription type of feature because it requires constant computation on our side. But then we have a feature such as dimming the blinds to a certain percentage that will be a one time purchase and the user will be able to use that feature on all Smart Blinds product under that account. If the product is continued down the line, then more flushed out and detailed features will be presented and decided to be on a subscription or one time purchase model.
+___
