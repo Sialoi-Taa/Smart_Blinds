@@ -49,9 +49,15 @@ document.addEventListener("DOMContentLoaded", function() {
             }
             // First FOR loop iterates through the rows
             for(var i = 0; i < response.length; i++) {
+              //console.log(response);
               start = response[i][0];
-              end = response[i][0];
-              state = response[i][0];
+              end = response[i][1];
+              state = response[i][2];
+              if (state == 1) {
+                state = "ON";
+              } else if( state == 0) {
+                state = "OFF";
+              }
               let child = document.createElement("div");
               child.class
               child.innerHTML = `From ${start} to ${end}, Smart Blinds product named: ${Product_Name} will be turned ${state}. <br>`;
@@ -80,9 +86,10 @@ document.addEventListener("DOMContentLoaded", function() {
           const url = "/state";
           const verb = "put";
           const data = {"state": State_Button.innerHTML};
-          server_request(url, data, verb, function() {
+          server_request(url, data, verb, (response) => {
             let message = response["message"];
-            State_Button.innerHTML = message;
+            console.log("Change_State_Button " + message);
+            Write_Button();
           });
         }
 
@@ -101,7 +108,6 @@ document.addEventListener("DOMContentLoaded", function() {
             }
           })
         }
-        check_session();
 
         // Function for adding interactivity for the add button
         function add_button_functionality() {
@@ -124,7 +130,7 @@ document.addEventListener("DOMContentLoaded", function() {
           start_time_input.type = "text";
           start_time_input.id = "Start_Time";
           start_time_input.name = "Start_Time";
-          start_time_input.pattern = "\d{2}:\d{2}";
+          start_time_input.pattern = "[0-9]{2}:[0-9]{2}";
           start_time_input.title = "Time should only be in the format HH:MM"
           form.appendChild(start_time_label);
           form.appendChild(start_time_input);
@@ -137,7 +143,7 @@ document.addEventListener("DOMContentLoaded", function() {
           end_time_input.type = "text";
           end_time_input.id = "End_Time";
           end_time_input.name = "End_Time";
-          end_time_input.pattern = "\d{2}:\d{2}";
+          end_time_input.pattern = "[0-9]{2}:[0-9]{2}";
           end_time_input.title = "Time should only be in the format HH:MM"
           form.appendChild(end_time_label);
           form.appendChild(end_time_input);
@@ -177,8 +183,10 @@ document.addEventListener("DOMContentLoaded", function() {
           const url = "/schedule";
           const verb = "post";
           const data = Object.fromEntries(new FormData(event.target).entries());
+          //console.log(data);
           server_request(url, data, verb, function(response) {
             message = response["message"];
+            //console.log(response);
             alert(message);
             document.body.removeChild(document.getElementById("Time_Input"));
             Add_Button.hidden = false
@@ -186,17 +194,48 @@ document.addEventListener("DOMContentLoaded", function() {
           })
         }
 
+        // A function to get a cookie's value
+        function getCookieValue(cookieName) {
+          // Because when looking at the cookies its in the form: cookie_name=cookie_value;cookie_name=cookie_value...
+          const cookies = document.cookie.split(';');
+          // Now we iterate over set of key value pairs of cookies
+          for (let i = 0; i < cookies.length; i++) {
+            // Removes the leading and trailing white space
+            const cookie = cookies[i].trim();
+            // Check if the cookie starts with the provided name
+            if (cookie.startsWith(cookieName + '=')) {
+              // Extract and return the cookie value by looking at the length 
+              // of the key value pair and start at the index of the length of 
+              // the key plus 1 which would be the equal sign
+              return cookie.substring(cookieName.length + 1);
+            }
+          }
+          // If the cookie is not found
+          return null;
+        }
+
+        function schedule_change_state() {
+          const url = "/schedule/product";
+          const verb = "get";
+          console.log("here");
+          server_get(url, verb, (response) => {
+            console.log("in");
+            message = response["message"];
+            Write_Button();
+          })
+        }
 
     // DOCUMENT ELEMENT VARIABLES ------------------------------------------------------>
         var Title = document.getElementById("Title");
         var State_Button = document.getElementById("State");
         var Add_Button = document.getElementById("Add_Button");
         var Schedule_List = document.getElementById("Schedule_List");
-        var Product_Name = document.cookie["Product_Name"];
+        var Product_Name = getCookieValue("Product_Name");
+        //var Username = getCookieValue("Username");
     
     // EVENT LISTENERS ----------------------------------------------------------------->
         Title.innerHTML = `${Product_Name}`;
-
+        load_schedules();
         State_Button.addEventListener("click", Change_State_Button);
         Add_Button.addEventListener("click", add_button_functionality);
 
@@ -205,5 +244,6 @@ document.addEventListener("DOMContentLoaded", function() {
     // Runs every minute to check for session ID expiration
     setInterval(function() {
       check_session();
-    }, 15000);
+      schedule_change_state();
+    }, 5000);
     })

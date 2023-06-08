@@ -190,10 +190,11 @@ def expired_session(session_ID:str) -> bool:
     cursor.execute("SELECT created_at FROM Active_Users WHERE Cookie=%s", (session_ID,))
     start_time = cursor.fetchone()[0]
     db.close()
-    start_time = datetime.strptime(start_time, "%Y-%m-%d %H:%M:%S.%f")
-    end_time = datetime.now()
+
+    end_time = datetime.datetime.now()
     time_diff = end_time - start_time
-    if(time_diff > 870):
+    print(time_diff.total_seconds())
+    if(time_diff.total_seconds() > 830.0):
         end_session(session_ID)
         return True
     return False
@@ -301,7 +302,7 @@ def update_state(Username:str, product_name:str, state:int) -> bool:
     cursor.execute("USE Smart_Blinds;")
     cursor.execute("SELECT Serial FROM Owners WHERE Username=%s AND Product_Name=%s", (Username, product_name,))
     serial = cursor.fetchone()[0]
-    cursor.execute("UPDATE State SET State=%d WHERE Serial=%s", (state, serial,))
+    cursor.execute("UPDATE State SET State=%s WHERE Serial=%s", (str(state), serial,))
     db.commit()
     db.close()
     if state:
@@ -309,7 +310,11 @@ def update_state(Username:str, product_name:str, state:int) -> bool:
     else:
         return False
 
-def add_schedule(start_time, end_time, state, serial) -> bool:
+def add_schedule(start_time:str, end_time:str, state:str, serial:str) -> bool:
+    if state == "ON":
+        state = 1
+    else:
+        state = 0
     db = mysql.connect(user=db_user, database=db_name, password=db_pass, host=db_host, auth_plugin='mysql_native_password')
     cursor = db.cursor()
     cursor.execute("USE Smart_Blinds;")
@@ -362,7 +367,7 @@ def schedule_check(serial: str) -> str:
             else:
                 message = "OFF"
             # Update the state table
-            cursor.execute("UPDATE State SET State=%d WHERE Serial=%s", (str(state), serial,))
+            cursor.execute("UPDATE State SET State=%s WHERE Serial=%s", (str(state), serial,))
             db.commit()
             break    
     db.close()
@@ -580,8 +585,8 @@ def schedule_loader(request: Request) -> list:
 
 # A route for getting the current state of the blinds
 @app.get("/state")
-def check_state(request: Request) -> list:
-    message = {"message": ""}
+def check_state(request: Request) -> dict:
+    message = {}
     Username = request.cookies.get("Username")
     Product_Name = request.cookies.get("Product_Name")
     success = check_state_product(Username, Product_Name)
@@ -593,12 +598,13 @@ def check_state(request: Request) -> list:
 
 # A route for updating the state of the Smart Blinds
 @app.put("/state")
-def update_the_state(request: Request) -> list:
-    message = {"message": ""}
-    state = request["state"]
+def update_the_state(request: Request) -> dict:
+    message = {}
     Username = request.cookies.get("Username")
     Product_Name = request.cookies.get("Product_Name")
-    if state == "ON":
+    success = check_state_product(Username, Product_Name)
+
+    if success:
         state = 1
     else:
         state = 0
@@ -616,11 +622,14 @@ def update_the_state(request: Request) -> list:
 # A route for getting the current state of the blinds
 @app.post("/schedule")
 def add_schedule_html(schedule: Schedule, request: Request) -> dict:
-    message = {"message": ""}
+    message = {}
     # HH:MM
     start_time = schedule.Start_Time
     end_time = schedule.End_Time
     state = schedule.State
+    print(start_time)
+    print(end_time)
+    print(state)
     Username = request.cookies.get("Username")
     Product_Name = request.cookies.get("Product_Name")
     serial = return_serial(Username, Product_Name)
@@ -631,14 +640,31 @@ def add_schedule_html(schedule: Schedule, request: Request) -> dict:
         message["message"] = "Schedule not added"
     return message
 
+# Routes for the schedule for the product page to update the button
+@app.get("/schedule/product")
+def get_new_state(request: Request) -> dict:
+    print("inside")
+    message = {}
+    Username = request.cookies.get("Username")
+    Product_Name = request.cookies.get("Product_Name")
+    serial = return_serial(Username, Product_Name)
+    # Check if the schedules and see if the blinds should be in a different state
+    schedule_check(serial)
+    success = state_check(serial)
+    
+    if success:
+        message["message"] = "ON"
+    else:
+        message["message"] = "OFF"
+
+    return message
 
 
 
-
-# Routes for the stock dictionaries.
+# Routes for the product fetches
 @app.get("/data/{serial}")
 def get_json(serial:str) -> dict:
-    message = {"message": ""}
+    message = {}
     # Check if the schedules and see if the blinds should be in a different state
     schedule_check(serial)
     success = state_check(serial)
