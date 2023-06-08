@@ -166,7 +166,7 @@ def create_session(response:Response, Email:str) -> str:
         return ""
     # Give the client a cookie with the session ID
     response.set_cookie(key="session_id", value=session_id, max_age=900)
-    response.set_cookie(key="Username", value=username)
+    response.set_cookie(key="Username", value=username, max_age=900)
     # Return the session ID as a string
     return session_id
 
@@ -193,7 +193,7 @@ def expired_session(session_ID:str) -> bool:
     start_time = datetime.strptime(start_time, "%Y-%m-%d %H:%M:%S.%f")
     end_time = datetime.now()
     time_diff = end_time - start_time
-    if(time_diff > 900):
+    if(time_diff > 870):
         end_session(session_ID)
         return True
     return False
@@ -232,9 +232,9 @@ def add_owner(username:str, product_name:str, serial_number:str) -> bool:
     db = mysql.connect(user=db_user, database=db_name, password=db_pass, host=db_host, auth_plugin='mysql_native_password')
     cursor = db.cursor()
     cursor.execute("USE Smart_Blinds;")
-    cursor.execute("INSERT INTO Owners (Username, Serial, Product_Name) VALUES (%s, %s, %s);", (username, product_name, serial_number,))
+    cursor.execute("INSERT INTO Owners (Username, Serial, Product_Name) VALUES (%s, %s, %s);", (username, serial_number, product_name,))
     db.commit()
-    count = cursor.rowcount()
+    count = cursor.rowcount
     db.close()
     if count == 0:
         return False
@@ -249,13 +249,13 @@ def unregister_product(serial_number) -> bool:
     # Delete the attachment between product and user
     cursor.execute("DELETE FROM Owners WHERE Serial=%s;", (serial_number,))
     db.commit()
-    count = cursor.rowcount()
+    count = cursor.rowcount
     if count == 0:
         db.close()
         return False
     cursor.execute("INSERT INTO Unregistered (Serial) VALUES (%s);", (serial_number,))
     db.commit()
-    count = cursor.rowcount()
+    count = cursor.rowcount
     db.close()
     if count == 0:
         return False
@@ -277,7 +277,7 @@ def get_user_products(Username:str) -> list:
     return results
 
 # A function for checking the state of a product in the MySQL tables
-def check_state(Username:str, product_name:str) -> bool:
+def check_state_product(Username:str, product_name:str) -> bool:
     db = mysql.connect(user=db_user, database=db_name, password=db_pass, host=db_host, auth_plugin='mysql_native_password')
     cursor = db.cursor()
     cursor.execute("USE Smart_Blinds;")
@@ -406,7 +406,7 @@ def get_landing_html() -> HTMLResponse:
 
 # A route for leading the user to a home page if they have a session ID already or the login HTML page
 @app.get("/login", response_class=HTMLResponse)
-def get_login_html(request: Request) -> HTMLResponse:
+def get_login_html(request: Request, response: Response) -> HTMLResponse:
     session_ID = request.cookies.get('session_id')
     Username = request.cookies.get('Username')
     if session_ID is None or Username is None:
@@ -425,7 +425,7 @@ def get_login_html(request: Request) -> HTMLResponse:
 # A route for processing the user's login information
 @app.put("/login")
 def verify_login(login: Login, response: Response) -> dict:
-    message = {"message": ""}
+    message = {}
     Email = login.Email
     Password = login.Password
     success = check_password(Email, Password)
@@ -495,10 +495,11 @@ def get_home_html() -> HTMLResponse:
 # A route for attaching a product to a user's account
 @app.post("/home")
 def add_product(owner: Owner, request: Request) -> dict:
-    message = {"message", ""}
+    message = {}
     Serial_Number = owner.Serial_Number
     Product_Name = owner.Product_Name
     Username = request.cookies.get("Username")
+    #print(Username)
 
     # Attempting to delete the serial number
     success = delete_unregistered_serial(Serial_Number)
@@ -517,7 +518,7 @@ def add_product(owner: Owner, request: Request) -> dict:
 # A route to unattach a product from a user's account
 @app.delete("/home")
 def delete_ownership(data: dict) -> dict:
-    message = {"message", ""}
+    message = {}
     Serial_number = data["Serial_Number"]
     success = unregister_product(Serial_number)
     if not success:
@@ -530,18 +531,20 @@ def delete_ownership(data: dict) -> dict:
 @app.get("/home/products")
 def get_products(request: Request) -> list:
     username = request.cookies.get("Username")
+    #print(username)
     products = get_user_products(username)
     return products
         
 # A route to check if a session is active, expired, or doesn't exist
 @app.get("/sessions")
-def check_session(request: Request, response: Response) -> list:
+def check_session(request: Request, response: Response) -> dict:
     session_id = request.cookies.get("session_id")
     username = request.cookies.get("Username")
-    message = {"message": ""}
+    message = {}
     if((session_id is None or username is None)):
         message["message"] = "Session doesn't exist"
-    success = expired_session(session_id, username)
+        return message
+    success = expired_session(session_id)
     if(success):
         message["message"] = "Session Expired"
         end_session(session_id)
@@ -566,7 +569,7 @@ def get_product_html() -> HTMLResponse:
 
 # A route to get all of the schedules assigned to one product
 @app.get("/schedule")
-def check_state(request: Request) -> list:
+def schedule_loader(request: Request) -> list:
     Username = request.cookies.get("Username")
     Product_Name = request.cookies.get("Product_Name")
     serial = return_serial(Username, Product_Name)
@@ -581,7 +584,7 @@ def check_state(request: Request) -> list:
     message = {"message": ""}
     Username = request.cookies.get("Username")
     Product_Name = request.cookies.get("Product_Name")
-    success = check_state(Username, Product_Name)
+    success = check_state_product(Username, Product_Name)
     if success:
         message["message"] = "ON"
     else:
@@ -646,25 +649,6 @@ def get_json(serial:str) -> dict:
         message["message"] = "OFF"
 
     return message
-
-
-@app.get("/state")
-def check_state(request: Request) -> list:
-    message = {"message": ""}
-    Username = request.cookies.get("Username")
-    Product_Name = request.cookies.get("Product_Name")
-    success = check_state(Username, Product_Name)
-    if success:
-        message["message"] = "ON"
-    else:
-        message["message"] = "OFF"
-    return message
-
-
-
-
-
-
 
 
 

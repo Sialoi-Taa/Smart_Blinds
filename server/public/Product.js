@@ -88,7 +88,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
         // Checks the validity of the user's session
         function check_session() {
-          const url = "/session";
+          const url = "/sessions";
           const verb = "get";
           server_get(url, verb, (response) => {
             message = response["message"];
@@ -180,10 +180,10 @@ document.addEventListener("DOMContentLoaded", function() {
           server_request(url, data, verb, function(response) {
             message = response["message"];
             alert(message);
+            document.body.removeChild(document.getElementById("Time_Input"));
+            Add_Button.hidden = false
+            load_schedules();
           })
-          document.body.removeChild(document.getElementById("Time_Input"));
-          Add_Button.hidden = false
-          load_schedules();
         }
 
 
@@ -205,5 +205,5 @@ document.addEventListener("DOMContentLoaded", function() {
     // Runs every minute to check for session ID expiration
     setInterval(function() {
       check_session();
-    },60000);
+    }, 15000);
     })

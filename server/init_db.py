@@ -82,9 +82,15 @@ try:
     cursor.execute("SELECT EXISTS(SELECT * FROM Unregistered WHERE Serial='PROTOTYPE');")
     result = cursor.fetchone()[0]
     if result == 0:
-      # Prototype in the unregistered
-      cursor.execute("INSERT INTO Unregistered (Serial) VALUES (%s)", ("PROTOTYPE",))
-      
+      cursor.execute("SELECT EXISTS(SELECT * FROM Owners WHERE Serial='PROTOTYPE');")
+      result = cursor.fetchone()[0]
+      if result == 0:
+        # Prototype in the unregistered
+        cursor.execute("INSERT INTO Unregistered (Serial) VALUES (%s)", ("PROTOTYPE",))
+    
+    cursor.execute("SELECT EXISTS(SELECT * FROM State WHERE Serial='PROTOTYPE');")
+    result = cursor.fetchone()[0]
+    if result == 0:
       # Set the state of the prototype
       cursor.execute("INSERT INTO State (Serial, State) VALUES (%s, %s)", ("PROTOTYPE", "0"))
 except RuntimeError as err:

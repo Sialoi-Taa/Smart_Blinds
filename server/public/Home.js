@@ -51,7 +51,7 @@ document.addEventListener("DOMContentLoaded", function() {
       serial_number_input.type = "text";
       serial_number_input.id = "Serial_Number";
       serial_number_input.name = "Serial_Number";
-      serial_number_input.pattern = "[a-zA-Z\d]{,12}";
+      serial_number_input.pattern = "{,12}";
       serial_number_input.title = "Serial number should be a 12 characters that are a mixture of letters and numbers"
       form.appendChild(serial_number_label);
       form.appendChild(serial_number_input);
@@ -64,7 +64,7 @@ document.addEventListener("DOMContentLoaded", function() {
       product_name_input.type = "text";
       product_name_input.id = "Product_Name";
       product_name_input.name = "Product_Name";
-      product_name_input.pattern = "[a-zA-Z\d]{,12}";
+      product_name_input.pattern = "{,12}";
       product_name_input.title = "Serial number should be a 12 characters that are a mixture of letters and numbers"
       form.appendChild(product_name_label);
       form.appendChild(product_name_input);
@@ -86,6 +86,8 @@ document.addEventListener("DOMContentLoaded", function() {
       const url = "/home/products";
       const verb = "get";
       server_get(url, verb, (response) => {
+        // [[Serial, Product_Name], [Serial, Product_Name]]
+        length = response.length;
         if(response.length > 0) {
           Products.hidden = false;
         }
@@ -110,6 +112,7 @@ document.addEventListener("DOMContentLoaded", function() {
     var add_product = function(event) {
       event.preventDefault()
       const data = Object.fromEntries(new FormData(event.target).entries());
+      console.log(data);
       // data = {"Serial_Number": input, "Product_Name": input}
       const url = "/home";
       const verb = "post";
@@ -121,14 +124,19 @@ document.addEventListener("DOMContentLoaded", function() {
         } else {
           alert("Product was successfully added!");
         }
+        add_button.hidden = false;
+        delete_button.hidden = false;
+        document.body.removeChild(reg_form);
+        //load_buttons();
+        location.reload();
       })
-      add_button.hidden = false;
-      delete_button.hidden = false;
-      document.body.removeChild(reg_form);
-      load_buttons();
     }
 
     function delete_form() {
+      if (length === 0) {
+        alert("There's no products to delete.")
+        return
+      }
       // Create a form element
       const form = document.createElement("form");
       form.id = "Product-Deletion";
@@ -173,38 +181,61 @@ document.addEventListener("DOMContentLoaded", function() {
         if(response["message"] == "Failure") {
           alert("Product wasn't deleted, something went wrong.");
         } else {
-          alert("Product was successfully added to your account!");
+          alert("Product was successfully removed from your account!");
         }
+        location.reload();
       }); 
-      load_buttons();
+      //load_buttons();
     }
 
     function check_session() {
-      const url = "/session";
+      const url = "/sessions";
       const verb = "get";
       server_get(url, verb, (response) => {
         message = response["message"];
-        if(message == "Session doesn't exist") {
+        if(message === "Session doesn't exist") {
           alert("Session doesn't exist, please log back in with valid credentials!");
           location.replace("/login");
-        } else if(message == "Session Expired") {
+        } else if(message === "Session Expired") {
           alert("Your session has expired! Please log back in with valid credentials.");
           location.replace("/login");
         }
       })
     }
-    check_session();
-    load_buttons();
+
+    // A function to get a cookie's value
+    function getCookieValue(cookieName) {
+      // Because when looking at the cookies its in the form: cookie_name=cookie_value;cookie_name=cookie_value...
+      const cookies = document.cookie.split(';');
+      // Now we iterate over set of key value pairs of cookies
+      for (let i = 0; i < cookies.length; i++) {
+        // Removes the leading and trailing white space
+        const cookie = cookies[i].trim();
+        // Check if the cookie starts with the provided name
+        if (cookie.startsWith(cookieName + '=')) {
+          // Extract and return the cookie value by looking at the length 
+          // of the key value pair and start at the index of the length of 
+          // the key plus 1 which would be the equal sign
+          return cookie.substring(cookieName.length + 1);
+        }
+      }
+      // If the cookie is not found
+      return null;
+    }
 
     // DOCUMENT ELEMENT VARIABLES ------------------------------------------------------>
     var Greetings = document.getElementById("Intro");
-    var Username = document.cookie["Username"];
+    var Username = getCookieValue("Username");
     var Products = document.getElementById("Product-Container");
     var add_button = document.getElementById("Add-Product");
     var delete_button = document.getElementById("Delete-Product");
-    var reg_form
+    var reg_form;
+    var length;
 
     // EVENT LISTENERS ----------------------------------------------------------------->
+    check_session();
+    load_buttons();
+
     Greetings.innerHTML = `Greetings, ${Username}!`;
     add_button.addEventListener("click", function() {
       delete_button.hidden = true;
@@ -222,5 +253,5 @@ document.addEventListener("DOMContentLoaded", function() {
     // Runs every minute to check for session ID expiration
     setInterval(function() {
       check_session();
-    },60000);
+    }, 15000);
     })
