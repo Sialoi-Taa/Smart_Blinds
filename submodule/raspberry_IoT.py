@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 # IMPORTS -------------------------------------------------------------------------------->
 import RPi.GPIO as GPIO
-import datetime
 import time
 import json
 import urllib.request
@@ -9,7 +8,7 @@ import urllib.request
 
 # VARIABLE INITIALIZATION -------------------------------------------------------------------------------->
 # Initializing the GPIO pins
-GpioPins = [26, 18]
+GpioPins = [24, 19]
 
 
 # FUNCTIONS -------------------------------------------------------------------------------->

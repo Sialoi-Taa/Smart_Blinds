@@ -7,7 +7,7 @@ from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles   # Used for serving static files
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import StreamingResponse
-import RPi.GPIO as GPIO
+# import RPi.GPIO as GPIO
 # Import the MySQL stuff
 import mysql.connector as mysql
 from dotenv import load_dotenv
@@ -18,7 +18,7 @@ import datetime
 # Import for the accelerometer
 #from mpu6050 import *
 # Import the motor library
-from RpiMotorLib import RpiMotorLib
+#from RpiMotorLib import RpiMotorLib
 import multiprocessing
 import bcrypt, secrets 
 from pydantic import BaseModel
@@ -321,10 +321,47 @@ def load_schedules(Serial:str) -> list:
         return []
     return results
 
+# A function for checking to see if the product needs to be turned on or off
+def schedule_check(serial: str) -> str:
+    message = ""
+    db = mysql.connect(host=db_host, database=db_name, user=db_user, passwd=db_pass)
+    cursor = db.cursor()
+    cursor.execute("SELECT Start_Time, End_Time, State FROM Schedule WHERE Serial=%s", (serial))
+    results = cursor.fetchall()
 
+    # Iterate through all of the schedules found
+    current_time = datetime.datetime.now()
+    for row in results:
+        start_time_hour = int(row[0][:2])
+        start_time_min  = int(row[0][3:])
+        end_time_hour   = int(row[1][:2])
+        end_time_min    = int(row[1][3:])
+        state = row[2]
+        # Logic for scheduling
+        # When the current time matches the time for the start time of a schedule, the state will change
+        # By making it this way, we can give the toggle feature priority 
+        if(start_time_hour == current_time.hour and start_time_min == current_time.minute):
+            if state:
+                message = "ON"
+            else:
+                message = "OFF"
+            # Update the state table
+            cursor.execute("UPDATE State SET State=%d WHERE Serial=%s", (state, serial))
+            db.commit()
+            break    
+    db.close()
+    return message
 
-
-
+# A function for checking the state of a product in the MySQL tables
+def state_check(Serial: str) -> bool:
+    db = mysql.connect(host=db_host, database=db_name, user=db_user, passwd=db_pass)
+    cursor = db.cursor()
+    cursor.execute("SELECT State FROM State WHERE Serial=%s", (Serial))
+    state = cursor.fetchone()[0]
+    db.close()
+    if state:
+        return True
+    return False
 
 
 
@@ -544,18 +581,19 @@ def update_the_state(request: Request) -> list:
     success = update_state(Username, Product_Name, state)
     if success:
         message["message"] = "ON"
-        for pin in GpioPins:
-            GPIO.output(pin,GPIO.HIGH)
+        #for pin in GpioPins:
+            #GPIO.output(pin,GPIO.HIGH)
     else:
         message["message"] = "OFF"
-        for pin in GpioPins:
-            GPIO.output(pin,GPIO.LOW)
+        #for pin in GpioPins:
+            #GPIO.output(pin,GPIO.LOW)
     return message
 
 # A route for getting the current state of the blinds
 @app.post("/schedule")
 def add_schedule_html(schedule: Schedule, request: Request) -> dict:
     message = {"message": ""}
+    # HH:MM
     start_time = schedule.Start_Time
     end_time = schedule.End_Time
     state = schedule.State
@@ -574,10 +612,20 @@ def add_schedule_html(schedule: Schedule, request: Request) -> dict:
 
 
 # Routes for the stock dictionaries.
-@app.get("/data/{product}")
-def get_json(product:str) -> dict:
+@app.get("/data/{serial}")
+def get_json(serial:str) -> dict:
     message = {"message": ""}
+    # Check if the schedules and see if the blinds should be in a different state
+    schedule_check(serial)
+    success = state_check(serial)
     
+    if success:
+        message["message"] = "ON"
+    else:
+        message["message"] = "OFF"
+
+    return message
+
 
 @app.get("/state")
 def check_state(request: Request) -> list:
@@ -600,8 +648,8 @@ def check_state(request: Request) -> list:
 
 
 if __name__ == '__main__':
+    uvicorn.run(app, host='0.0.0.0', port=8000)
     # Create a Process object and start the process
     #setup()
     #my_process = multiprocessing.Process(target=log_sensors)
     #my_process.start()
-    uvicorn.run(app, host='0.0.0.0', port=8000)

@@ -57,6 +57,7 @@ document.addEventListener("DOMContentLoaded", function() {
     }
     // DOCUMENT ELEMENT VARIABLES ------------------------------------------------------>
     var Form = document.getElementById("Register-Form");
+    
     var the_message;
     
     // EVENT LISTENERS ----------------------------------------------------------------->
