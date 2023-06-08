@@ -193,7 +193,7 @@ def expired_session(session_ID:str) -> bool:
 
     end_time = datetime.datetime.now()
     time_diff = end_time - start_time
-    print(time_diff.total_seconds())
+    #print(time_diff.total_seconds())
     if(time_diff.total_seconds() > 830.0):
         end_session(session_ID)
         return True
@@ -627,9 +627,6 @@ def add_schedule_html(schedule: Schedule, request: Request) -> dict:
     start_time = schedule.Start_Time
     end_time = schedule.End_Time
     state = schedule.State
-    print(start_time)
-    print(end_time)
-    print(state)
     Username = request.cookies.get("Username")
     Product_Name = request.cookies.get("Product_Name")
     serial = return_serial(Username, Product_Name)
@@ -643,7 +640,7 @@ def add_schedule_html(schedule: Schedule, request: Request) -> dict:
 # Routes for the schedule for the product page to update the button
 @app.get("/schedule/product")
 def get_new_state(request: Request) -> dict:
-    print("inside")
+    #print("inside")
     message = {}
     Username = request.cookies.get("Username")
     Product_Name = request.cookies.get("Product_Name")
@@ -679,7 +676,7 @@ def get_json(serial:str) -> dict:
 
 
 if __name__ == '__main__':
-    uvicorn.run(app, host='0.0.0.0', port=8000)
+    uvicorn.run(app, host='0.0.0.0', port=3000)
     # Create a Process object and start the process
     #setup()
     #my_process = multiprocessing.Process(target=log_sensors)
