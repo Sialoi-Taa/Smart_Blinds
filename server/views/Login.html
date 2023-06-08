@@ -3,20 +3,20 @@
     <head>
         <title>Login</title>
         <!-- The JS file for this HTML file -->
-        <script src="/Smart_Blinds/server/public/Login.js" defer></script>
-        <!-- The CSS file for this HTML file 
-        <link rel="stylesheet" href="public/Landing_Page.css"> -->
+        <script src="../public/Login.js" defer></script>
+        <!-- The CSS file for this HTML file -->
+        <link rel="stylesheet" href="../public/style.css">
     </head>
     <body>
-        <header>Login below!</header>
+        <h1>Login below!</h1>
         <form id="Login-Form">
             <label for="Email">Email:</label><br>
-            <input type="text" id="Email" name="Email" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$" title="Please input an email such as jdoe@ucsd.edu" required><br>
+            <input type="text" id="Email" name="Email" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$" title="Please input an email such as jdoe@ucsd.edu" required><br><br>
             <label for="Password">Password:</label><br>
-            <input type="text" id="Password" name="Password" pattern="(?=.*\d)(?=.*[a-zA-Z])[a-zA-Z\d]{8,}" title="Please have at least 1 digit and only letters in your password and at least 8 characters." required> <br>
+            <input type="text" id="Password" name="Password" pattern="(?=.*\d)(?=.*[a-zA-Z])[a-zA-Z\d]{8,}" title="Please have at least 1 digit and only letters in your password and at least 8 characters." required> <br><br>
             <input type="submit">
-        </form>
-        <a href="http://localhost:8000/">Welcome Page</a>
+        </form><br>
+        <a href="http://localhost:8000/">Welcome Page</a><br><br>
         <a href="http://localhost:8000/register/">Register Now</a>
     </body>
 </html>

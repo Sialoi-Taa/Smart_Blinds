@@ -50,6 +50,7 @@ app = FastAPI()
 
 # Mount the static directory
 app.mount("/public", StaticFiles(directory="public"), name="public")
+app.mount("/views", StaticFiles(directory="views"), name="views")
 
 class Registration(BaseModel):
     Email: str
@@ -90,7 +91,7 @@ def find_email(Email:str):
     #db = mysql.connect(host=db_host, database=db_name, user=db_user, passwd=db_pass)
     cursor = db.cursor()
     cursor.execute("USE Smart_Blinds;")
-    cursor.execute("SELECT * FROM Users WHERE Email=%s", (str(Email)))
+    cursor.execute("SELECT * FROM Users WHERE Email=%s", (str(Email),))
     result = cursor.fetchone()
     db.close()
     if result is None:
@@ -101,7 +102,8 @@ def find_email(Email:str):
 def check_password(Email:str, Password:str) -> bool:
     db = mysql.connect(user=db_user, database=db_name, password=db_pass, host=db_host, auth_plugin='mysql_native_password')
     cursor = db.cursor()
-    cursor.execute("SELECT Password FROM Users WHERE Email=%s", (str(Email)))
+    cursor.execute("USE Smart_Blinds;")
+    cursor.execute("SELECT Password FROM Users WHERE Email=%s", (str(Email),))
     table_password = cursor.fetchone()
     db.close()
     if table_password is not None:
@@ -113,7 +115,7 @@ def find_username(Username:str) -> bool:
     db = mysql.connect(user=db_user, database=db_name, password=db_pass, host=db_host, auth_plugin='mysql_native_password')
     cursor = db.cursor()
     cursor.execute("USE Smart_Blinds;")
-    cursor.execute("SELECT * FROM Users WHERE Username=%s", (str(Username)))
+    cursor.execute("SELECT * FROM Users WHERE Username=%s", (str(Username),))
     result = cursor.fetchone()
     db.close()
     if result is None:
@@ -125,7 +127,7 @@ def return_serial(Username:str, Product_Name:str) -> str:
     db = mysql.connect(user=db_user, database=db_name, password=db_pass, host=db_host, auth_plugin='mysql_native_password')
     cursor = db.cursor()
     cursor.execute("USE Smart_Blinds;")
-    cursor.execute("SELECT Serial FROM Owners WHERE Username=%s AND Product_Name=%s", (str(Username), str(Product_Name)))
+    cursor.execute("SELECT Serial FROM Owners WHERE Username=%s AND Product_Name=%s", (str(Username), str(Product_Name),))
     result = cursor.fetchone()[0]
     db.close()
     return result
@@ -135,7 +137,7 @@ def create_user(Username:str, Password:str, Email:str):
     db = mysql.connect(user=db_user, database=db_name, password=db_pass, host=db_host, auth_plugin='mysql_native_password')
     cursor = db.cursor()
     cursor.execute("USE Smart_Blinds;")
-    cursor.execute("INSERT INTO Users (Username, Password, Email) VALUES (%s, %s, %s)", (Username, Password, Email))
+    cursor.execute("INSERT INTO Users (Username, Password, Email) VALUES (%s, %s, %s)", (Username, Password, Email,))
     db.commit()
     db.close()
 
@@ -146,12 +148,13 @@ def create_session(response:Response, Email:str) -> str:
     # Connect to mysql
     db = mysql.connect(user=db_user, database=db_name, password=db_pass, host=db_host, auth_plugin='mysql_native_password')
     cursor = db.cursor()
-    cursor.execute("SELECT Username FROM Users WHERE Email=%s", (str(Email)))
+    cursor.execute("USE Smart_Blinds;")
+    cursor.execute("SELECT Username FROM Users WHERE Email=%s", (str(Email),))
     username = cursor.fetchone()[0]
     # Delete the previous session for that username
-    cursor.execute("DELETE FROM Active_Users WHERE Username=%s;", (str(username)))
+    cursor.execute("DELETE FROM Active_Users WHERE Username=%s;", (str(username),))
     # Insert a new session for that specific user
-    cursor.execute("INSERT INTO Active_Users (Username, Cookie, created_at) VALUES (%s, %s, %s);", (str(username), str(session_id), str(datetime.datetime.now())))
+    cursor.execute("INSERT INTO Active_Users (Username, Cookie, created_at) VALUES (%s, %s, %s);", (str(username), str(session_id), str(datetime.datetime.now()),))
     # Commit to the database
     db.commit()
     # Count how many rows are affected
@@ -171,7 +174,8 @@ def create_session(response:Response, Email:str) -> str:
 def check_sessionID(Username:str, session_id:str) -> bool:
     db = mysql.connect(user=db_user, database=db_name, password=db_pass, host=db_host, auth_plugin='mysql_native_password')
     cursor = db.cursor()
-    cursor.execute("SELECT Cookie FROM Active_Users WHERE Username=%s", (Username))
+    cursor.execute("USE Smart_Blinds;")
+    cursor.execute("SELECT Cookie FROM Active_Users WHERE Username=%s", (Username,))
     session_ID = cursor.fetchone()
     db.close()
     if ((session_ID is None) or (session_ID is not session_id)):
@@ -182,7 +186,8 @@ def check_sessionID(Username:str, session_id:str) -> bool:
 def expired_session(session_ID:str) -> bool:
     db = mysql.connect(user=db_user, database=db_name, password=db_pass, host=db_host, auth_plugin='mysql_native_password')
     cursor = db.cursor()
-    cursor.execute("SELECT created_at FROM Active_Users WHERE Cookie=%s", (session_ID))
+    cursor.execute("USE Smart_Blinds;")
+    cursor.execute("SELECT created_at FROM Active_Users WHERE Cookie=%s", (session_ID,))
     start_time = cursor.fetchone()[0]
     db.close()
     start_time = datetime.strptime(start_time, "%Y-%m-%d %H:%M:%S.%f")
@@ -197,7 +202,8 @@ def expired_session(session_ID:str) -> bool:
 def end_session(session_id:str) -> bool:
     db = mysql.connect(user=db_user, database=db_name, password=db_pass, host=db_host, auth_plugin='mysql_native_password')
     cursor = db.cursor()
-    cursor.execute("DELETE FROM Active_Users WHERE Cookie=%s;", (session_id))
+    cursor.execute("USE Smart_Blinds;")
+    cursor.execute("DELETE FROM Active_Users WHERE Cookie=%s;", (session_id,))
     db.commit()
     count = cursor.rowcount
     db.close()
@@ -209,10 +215,11 @@ def end_session(session_id:str) -> bool:
 def delete_unregistered_serial(serial_number:str) -> bool:
     db = mysql.connect(user=db_user, database=db_name, password=db_pass, host=db_host, auth_plugin='mysql_native_password')
     cursor = db.cursor()
-    cursor.execute("SELECT EXISTS(SELECT * FROM Unregistered WHERE Serial=%s);", (serial_number))
+    cursor.execute("USE Smart_Blinds;")
+    cursor.execute("SELECT EXISTS(SELECT * FROM Unregistered WHERE Serial=%s);", (serial_number,))
     result = cursor.fetchall()
     if result[0][0] == 1:
-        cursor.execute("DELETE FROM Unregistered WHERE Serial=%s;", (serial_number))
+        cursor.execute("DELETE FROM Unregistered WHERE Serial=%s;", (serial_number,))
         db.commit()
         db.close()
         return True
@@ -224,7 +231,8 @@ def delete_unregistered_serial(serial_number:str) -> bool:
 def add_owner(username:str, product_name:str, serial_number:str) -> bool:
     db = mysql.connect(user=db_user, database=db_name, password=db_pass, host=db_host, auth_plugin='mysql_native_password')
     cursor = db.cursor()
-    cursor.execute("INSERT INTO Owners (Username, Serial, Product_Name) VALUES (%s, %s, %s);", (username, product_name, serial_number))
+    cursor.execute("USE Smart_Blinds;")
+    cursor.execute("INSERT INTO Owners (Username, Serial, Product_Name) VALUES (%s, %s, %s);", (username, product_name, serial_number,))
     db.commit()
     count = cursor.rowcount()
     db.close()
@@ -236,15 +244,16 @@ def add_owner(username:str, product_name:str, serial_number:str) -> bool:
 def unregister_product(serial_number) -> bool:
     db = mysql.connect(user=db_user, database=db_name, password=db_pass, host=db_host, auth_plugin='mysql_native_password')
     cursor = db.cursor()
+    cursor.execute("USE Smart_Blinds;")
 
     # Delete the attachment between product and user
-    cursor.execute("DELETE FROM Owners WHERE Serial=%s;", (serial_number))
+    cursor.execute("DELETE FROM Owners WHERE Serial=%s;", (serial_number,))
     db.commit()
     count = cursor.rowcount()
     if count == 0:
         db.close()
         return False
-    cursor.execute("INSERT INTO Unregistered (Serial) VALUES (%s);", (serial_number))
+    cursor.execute("INSERT INTO Unregistered (Serial) VALUES (%s);", (serial_number,))
     db.commit()
     count = cursor.rowcount()
     db.close()
@@ -256,7 +265,8 @@ def unregister_product(serial_number) -> bool:
 def get_user_products(Username:str) -> list:
     db = mysql.connect(user=db_user, database=db_name, password=db_pass, host=db_host, auth_plugin='mysql_native_password')
     cursor = db.cursor()
-    cursor.execute("SELECT Serial, Product_Name FROM Owners WHERE Username=%s", (Username))
+    cursor.execute("USE Smart_Blinds;")
+    cursor.execute("SELECT Serial, Product_Name FROM Owners WHERE Username=%s", (Username,))
     # Will be in the form results[rows][columns]
     results = cursor.fetchall()
     db.close()
@@ -270,9 +280,10 @@ def get_user_products(Username:str) -> list:
 def check_state(Username:str, product_name:str) -> bool:
     db = mysql.connect(user=db_user, database=db_name, password=db_pass, host=db_host, auth_plugin='mysql_native_password')
     cursor = db.cursor()
-    cursor.execute("SELECT Serial FROM Owners WHERE Username=%s AND Product_Name=%s", (Username, product_name))
+    cursor.execute("USE Smart_Blinds;")
+    cursor.execute("SELECT Serial FROM Owners WHERE Username=%s AND Product_Name=%s", (Username, product_name,))
     serial = cursor.fetchone()[0]
-    cursor.execute("SELECT State FROM State WHERE Serial=%s", (serial))
+    cursor.execute("SELECT State FROM State WHERE Serial=%s", (serial,))
     state = cursor.fetchone()[0]
     db.close()
     if state:
@@ -287,9 +298,10 @@ def update_state(Username:str, product_name:str, state:int) -> bool:
         state = 1
     db = mysql.connect(user=db_user, database=db_name, password=db_pass, host=db_host, auth_plugin='mysql_native_password')
     cursor = db.cursor()
-    cursor.execute("SELECT Serial FROM Owners WHERE Username=%s AND Product_Name=%s", (Username, product_name))
+    cursor.execute("USE Smart_Blinds;")
+    cursor.execute("SELECT Serial FROM Owners WHERE Username=%s AND Product_Name=%s", (Username, product_name,))
     serial = cursor.fetchone()[0]
-    cursor.execute("UPDATE State SET State=%d WHERE Serial=%s", (state, serial))
+    cursor.execute("UPDATE State SET State=%d WHERE Serial=%s", (state, serial,))
     db.commit()
     db.close()
     if state:
@@ -300,7 +312,8 @@ def update_state(Username:str, product_name:str, state:int) -> bool:
 def add_schedule(start_time, end_time, state, serial) -> bool:
     db = mysql.connect(user=db_user, database=db_name, password=db_pass, host=db_host, auth_plugin='mysql_native_password')
     cursor = db.cursor()
-    cursor.execute("INSERT INTO Schedule (Serial, Start_Time, End_Time, State) VALUES (%s, %s, %s, %s)", (serial, start_time, end_time, state))
+    cursor.execute("USE Smart_Blinds;")
+    cursor.execute("INSERT INTO Schedule (Serial, Start_Time, End_Time, State) VALUES (%s, %s, %s, %s)", (serial, start_time, end_time, state,))
     db.commit()
     count = cursor.rowcount
     db.close()
@@ -312,7 +325,8 @@ def add_schedule(start_time, end_time, state, serial) -> bool:
 def load_schedules(Serial:str) -> list:
     db = mysql.connect(user=db_user, database=db_name, password=db_pass, host=db_host, auth_plugin='mysql_native_password')
     cursor = db.cursor()
-    cursor.execute("SELECT Start_Time, End_Time, State FROM Schedule WHERE Serial=%s", (Serial))
+    cursor.execute("USE Smart_Blinds;")
+    cursor.execute("SELECT Start_Time, End_Time, State FROM Schedule WHERE Serial=%s", (Serial,))
     # Will be in the form results[rows][columns]
     results = cursor.fetchall()
     db.close()
@@ -327,7 +341,8 @@ def schedule_check(serial: str) -> str:
     message = ""
     db = mysql.connect(user=db_user, database=db_name, password=db_pass, host=db_host, auth_plugin='mysql_native_password')
     cursor = db.cursor()
-    cursor.execute("SELECT Start_Time, End_Time, State FROM Schedule WHERE Serial=%s", (serial))
+    cursor.execute("USE Smart_Blinds;")
+    cursor.execute("SELECT Start_Time, End_Time, State FROM Schedule WHERE Serial=%s", (serial,))
     results = cursor.fetchall()
 
     # Iterate through all of the schedules found
@@ -347,7 +362,7 @@ def schedule_check(serial: str) -> str:
             else:
                 message = "OFF"
             # Update the state table
-            cursor.execute("UPDATE State SET State=%d WHERE Serial=%s", (str(state), serial))
+            cursor.execute("UPDATE State SET State=%d WHERE Serial=%s", (str(state), serial,))
             db.commit()
             break    
     db.close()
@@ -357,7 +372,8 @@ def schedule_check(serial: str) -> str:
 def state_check(Serial: str) -> bool:
     db = mysql.connect(user=db_user, database=db_name, password=db_pass, host=db_host, auth_plugin='mysql_native_password')
     cursor = db.cursor()
-    cursor.execute("SELECT State FROM State WHERE Serial=%s", (Serial))
+    cursor.execute("USE Smart_Blinds;")
+    cursor.execute("SELECT State FROM State WHERE Serial=%s", (Serial,))
     state = cursor.fetchone()[0]
     db.close()
     if state:
@@ -433,8 +449,12 @@ def get_register_html() -> HTMLResponse:
         return HTMLResponse(content=html.read())
 
 # A route that processes the user's registration data
-@app.post("/register")
-def register_user(registration: Registration) -> dict:
+@app.post("/register") # registration: Registration request: Request
+async def register_user(registration: Registration) -> dict:
+    #print(registration.Email)
+    #print(registration.Username)
+    #print(registration.Password)
+
     # First check to see if the email is in use already
     Email = registration.Email
     Found = find_email(Email)

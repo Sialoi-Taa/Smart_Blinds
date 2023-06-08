@@ -35,23 +35,25 @@ document.addEventListener("DOMContentLoaded", function() {
     }
         
     // Function for submitting the form data
-    function submission(theForm) {
-      const data = Object.fromEntries(new FormData(theForm).entries());
+    function submission() {
+      const data = Object.fromEntries(new FormData(Form).entries());
       // {"Email": input, "Username": input, "Password": input}
       const url = "/register";
       const verb = "post";
-      let message
+      let message;
       // Will attempt to create a new user
       server_request(url, data, verb, (response) => {
         message = response["message"]
         if(message == "Username not unique") {
           alert("Username is already in use! Please choose a different one.");
-          the_message = false;
+          location.reload();
         } else if(message == "Email already in use") {
           alert("Email is in use with another account. Please choose a different one.");
-          the_message = false;
+          location.reload();
+        } else {
+          alert("Welcome to the Smart Blinds family! >:D");
+          location.replace("/login");
         }
-        the_message = true;
       })
       return the_message
     }
@@ -64,13 +66,6 @@ document.addEventListener("DOMContentLoaded", function() {
     Form.addEventListener("submit", function(event) {
       // Prevents the page form reloading
       event.preventDefault();
-      success = submission(Form);
-      // If user was successfully created, then relocate them to the login page
-      if(success) {
-        alert("Welcome to the Smart Blinds family! >:D");
-        location.replace("/login");
-      } else {
-        location.reload();
-      }
+      submission();
     });
     })

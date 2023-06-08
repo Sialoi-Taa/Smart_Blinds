@@ -62,8 +62,6 @@ try:
         State                INTEGER(1) NOT NULL
     );
     """)
-    # Set the state of the prototype
-    cursor.execute("INSERT INTO State (Serial, State) VALUES (%s, %s)", ("PROTOTYPE", "0"))
     # Create an Owners table
     cursor.execute("""
     CREATE TABLE if not exists Owners (
@@ -81,7 +79,14 @@ try:
     );
     """)
     # Place the prototype
-    cursor.execute("INSERT INTO Unregistered (Serial) VALUES (%s)", ("PROTOTYPE",))
+    cursor.execute("SELECT EXISTS(SELECT * FROM Unregistered WHERE Serial='PROTOTYPE');")
+    result = cursor.fetchone()[0]
+    if result == 0:
+      # Prototype in the unregistered
+      cursor.execute("INSERT INTO Unregistered (Serial) VALUES (%s)", ("PROTOTYPE",))
+      
+      # Set the state of the prototype
+      cursor.execute("INSERT INTO State (Serial, State) VALUES (%s, %s)", ("PROTOTYPE", "0"))
 except RuntimeError as err:
    print("runtime error: {0}".format(err))
 
