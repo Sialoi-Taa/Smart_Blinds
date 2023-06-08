@@ -35,8 +35,8 @@ document.addEventListener("DOMContentLoaded", function() {
     }
     
     // Function for checking login information is correct
-    function verification(theForm) {
-      const data = Object.fromEntries(new FormData(theForm).entries());
+    function verification() {
+      const data = Object.fromEntries(new FormData(form).entries());
       // {"Email": input, "Password": input}
       const url = "/login";
       const verb = "put";
@@ -46,8 +46,12 @@ document.addEventListener("DOMContentLoaded", function() {
         message = response["message"];
         if(message == "Success") {
           the_message = true;
+          alert("Welcome!");
+          location.replace("/home");
         } else {
           the_message = false;
+          alert("Wrong login information!");
+          location.reload();
         }
       })
       return the_message;
@@ -59,13 +63,6 @@ document.addEventListener("DOMContentLoaded", function() {
     // EVENT LISTENERS ----------------------------------------------------------------->
     form.addEventListener("submit", function(event) {
       event.preventDefault();
-      success = verification(form);
-      if(success) {
-        alert("Welcome!");
-        location.replace("/home");
-      } else {
-        alert("Wrong login information!");
-        location.reload();
-      }
+      verification();
     })
     })
