@@ -86,7 +86,8 @@ class Schedule(BaseModel):
 
 # Function to find the existence of an email
 def find_email(Email:str):
-    db = mysql.connect(host=db_host, database=db_name, user=db_user, passwd=db_pass)
+    db = mysql.connect(user=db_user, database=db_name, password=db_pass, host=db_host, auth_plugin='mysql_native_password')
+    #db = mysql.connect(host=db_host, database=db_name, user=db_user, passwd=db_pass)
     cursor = db.cursor()
     cursor.execute("USE Smart_Blinds;")
     cursor.execute("SELECT * FROM Users WHERE Email=%s", (str(Email)))
@@ -98,7 +99,7 @@ def find_email(Email:str):
 
 # Function to check a user's login info is correct
 def check_password(Email:str, Password:str) -> bool:
-    db = mysql.connect(host=db_host, database=db_name, user=db_user, passwd=db_pass)
+    db = mysql.connect(user=db_user, database=db_name, password=db_pass, host=db_host, auth_plugin='mysql_native_password')
     cursor = db.cursor()
     cursor.execute("SELECT Password FROM Users WHERE Email=%s", (str(Email)))
     table_password = cursor.fetchone()
@@ -109,7 +110,7 @@ def check_password(Email:str, Password:str) -> bool:
 
 # Function to find the existence of a username
 def find_username(Username:str) -> bool:
-    db = mysql.connect(host=db_host, database=db_name, user=db_user, passwd=db_pass)
+    db = mysql.connect(user=db_user, database=db_name, password=db_pass, host=db_host, auth_plugin='mysql_native_password')
     cursor = db.cursor()
     cursor.execute("USE Smart_Blinds;")
     cursor.execute("SELECT * FROM Users WHERE Username=%s", (str(Username)))
@@ -121,7 +122,7 @@ def find_username(Username:str) -> bool:
 
 # Function to find the serial in the Owners table through product name and username 
 def return_serial(Username:str, Product_Name:str) -> str:
-    db = mysql.connect(host=db_host, database=db_name, user=db_user, passwd=db_pass)
+    db = mysql.connect(user=db_user, database=db_name, password=db_pass, host=db_host, auth_plugin='mysql_native_password')
     cursor = db.cursor()
     cursor.execute("USE Smart_Blinds;")
     cursor.execute("SELECT Serial FROM Owners WHERE Username=%s AND Product_Name=%s", (str(Username), str(Product_Name)))
@@ -131,7 +132,7 @@ def return_serial(Username:str, Product_Name:str) -> str:
 
 # Function to create a new user in the database
 def create_user(Username:str, Password:str, Email:str):
-    db = mysql.connect(host=db_host, database=db_name, user=db_user, passwd=db_pass)
+    db = mysql.connect(user=db_user, database=db_name, password=db_pass, host=db_host, auth_plugin='mysql_native_password')
     cursor = db.cursor()
     cursor.execute("USE Smart_Blinds;")
     cursor.execute("INSERT INTO Users (Username, Password, Email) VALUES (%s, %s, %s)", (Username, Password, Email))
@@ -143,7 +144,7 @@ def create_session(response:Response, Email:str) -> str:
     # Create a session ID
     session_id = secrets.token_urlsafe(16)
     # Connect to mysql
-    db = mysql.connect(host=db_host, database=db_name, user=db_user, passwd=db_pass)
+    db = mysql.connect(user=db_user, database=db_name, password=db_pass, host=db_host, auth_plugin='mysql_native_password')
     cursor = db.cursor()
     cursor.execute("SELECT Username FROM Users WHERE Email=%s", (str(Email)))
     username = cursor.fetchone()[0]
@@ -168,7 +169,7 @@ def create_session(response:Response, Email:str) -> str:
 
 # Function to check the existence of a session ID attached to a username and return what it finds
 def check_sessionID(Username:str, session_id:str) -> bool:
-    db = mysql.connect(host=db_host, database=db_name, user=db_user, passwd=db_pass)
+    db = mysql.connect(user=db_user, database=db_name, password=db_pass, host=db_host, auth_plugin='mysql_native_password')
     cursor = db.cursor()
     cursor.execute("SELECT Cookie FROM Active_Users WHERE Username=%s", (Username))
     session_ID = cursor.fetchone()
@@ -179,7 +180,7 @@ def check_sessionID(Username:str, session_id:str) -> bool:
 
 # Function to use to see if a session should have expired
 def expired_session(session_ID:str) -> bool:
-    db = mysql.connect(host=db_host, database=db_name, user=db_user, passwd=db_pass)
+    db = mysql.connect(user=db_user, database=db_name, password=db_pass, host=db_host, auth_plugin='mysql_native_password')
     cursor = db.cursor()
     cursor.execute("SELECT created_at FROM Active_Users WHERE Cookie=%s", (session_ID))
     start_time = cursor.fetchone()[0]
@@ -194,7 +195,7 @@ def expired_session(session_ID:str) -> bool:
 
 # Function to end a session and delete it from the database
 def end_session(session_id:str) -> bool:
-    db = mysql.connect(host=db_host, database=db_name, user=db_user, passwd=db_pass)
+    db = mysql.connect(user=db_user, database=db_name, password=db_pass, host=db_host, auth_plugin='mysql_native_password')
     cursor = db.cursor()
     cursor.execute("DELETE FROM Active_Users WHERE Cookie=%s;", (session_id))
     db.commit()
@@ -206,7 +207,7 @@ def end_session(session_id:str) -> bool:
 
 # Function to delete a serial from the unregistered table
 def delete_unregistered_serial(serial_number:str) -> bool:
-    db = mysql.connect(host=db_host, database=db_name, user=db_user, passwd=db_pass)
+    db = mysql.connect(user=db_user, database=db_name, password=db_pass, host=db_host, auth_plugin='mysql_native_password')
     cursor = db.cursor()
     cursor.execute("SELECT EXISTS(SELECT * FROM Unregistered WHERE Serial=%s);", (serial_number))
     result = cursor.fetchall()
@@ -221,7 +222,7 @@ def delete_unregistered_serial(serial_number:str) -> bool:
 
 # Function to add an owner
 def add_owner(username:str, product_name:str, serial_number:str) -> bool:
-    db = mysql.connect(host=db_host, database=db_name, user=db_user, passwd=db_pass)
+    db = mysql.connect(user=db_user, database=db_name, password=db_pass, host=db_host, auth_plugin='mysql_native_password')
     cursor = db.cursor()
     cursor.execute("INSERT INTO Owners (Username, Serial, Product_Name) VALUES (%s, %s, %s);", (username, product_name, serial_number))
     db.commit()
@@ -233,7 +234,7 @@ def add_owner(username:str, product_name:str, serial_number:str) -> bool:
 
 # Function to unregister a product
 def unregister_product(serial_number) -> bool:
-    db = mysql.connect(host=db_host, database=db_name, user=db_user, passwd=db_pass)
+    db = mysql.connect(user=db_user, database=db_name, password=db_pass, host=db_host, auth_plugin='mysql_native_password')
     cursor = db.cursor()
 
     # Delete the attachment between product and user
@@ -253,7 +254,7 @@ def unregister_product(serial_number) -> bool:
 
 # A function for getting all of the products under a user's account
 def get_user_products(Username:str) -> list:
-    db = mysql.connect(host=db_host, database=db_name, user=db_user, passwd=db_pass)
+    db = mysql.connect(user=db_user, database=db_name, password=db_pass, host=db_host, auth_plugin='mysql_native_password')
     cursor = db.cursor()
     cursor.execute("SELECT Serial, Product_Name FROM Owners WHERE Username=%s", (Username))
     # Will be in the form results[rows][columns]
@@ -267,7 +268,7 @@ def get_user_products(Username:str) -> list:
 
 # A function for checking the state of a product in the MySQL tables
 def check_state(Username:str, product_name:str) -> bool:
-    db = mysql.connect(host=db_host, database=db_name, user=db_user, passwd=db_pass)
+    db = mysql.connect(user=db_user, database=db_name, password=db_pass, host=db_host, auth_plugin='mysql_native_password')
     cursor = db.cursor()
     cursor.execute("SELECT Serial FROM Owners WHERE Username=%s AND Product_Name=%s", (Username, product_name))
     serial = cursor.fetchone()[0]
@@ -280,11 +281,11 @@ def check_state(Username:str, product_name:str) -> bool:
 
 # A function updating the state of a product in the MySQL tables
 def update_state(Username:str, product_name:str, state:int) -> bool:
-    if state is 1:
+    if state == 1:
         state = 0
     else:
         state = 1
-    db = mysql.connect(host=db_host, database=db_name, user=db_user, passwd=db_pass)
+    db = mysql.connect(user=db_user, database=db_name, password=db_pass, host=db_host, auth_plugin='mysql_native_password')
     cursor = db.cursor()
     cursor.execute("SELECT Serial FROM Owners WHERE Username=%s AND Product_Name=%s", (Username, product_name))
     serial = cursor.fetchone()[0]
@@ -297,7 +298,7 @@ def update_state(Username:str, product_name:str, state:int) -> bool:
         return False
 
 def add_schedule(start_time, end_time, state, serial) -> bool:
-    db = mysql.connect(host=db_host, database=db_name, user=db_user, passwd=db_pass)
+    db = mysql.connect(user=db_user, database=db_name, password=db_pass, host=db_host, auth_plugin='mysql_native_password')
     cursor = db.cursor()
     cursor.execute("INSERT INTO Schedule (Serial, Start_Time, End_Time, State) VALUES (%s, %s, %s, %s)", (serial, start_time, end_time, state))
     db.commit()
@@ -309,7 +310,7 @@ def add_schedule(start_time, end_time, state, serial) -> bool:
 
 # A function for getting all of the products under a user's account
 def load_schedules(Serial:str) -> list:
-    db = mysql.connect(host=db_host, database=db_name, user=db_user, passwd=db_pass)
+    db = mysql.connect(user=db_user, database=db_name, password=db_pass, host=db_host, auth_plugin='mysql_native_password')
     cursor = db.cursor()
     cursor.execute("SELECT Start_Time, End_Time, State FROM Schedule WHERE Serial=%s", (Serial))
     # Will be in the form results[rows][columns]
@@ -324,7 +325,7 @@ def load_schedules(Serial:str) -> list:
 # A function for checking to see if the product needs to be turned on or off
 def schedule_check(serial: str) -> str:
     message = ""
-    db = mysql.connect(host=db_host, database=db_name, user=db_user, passwd=db_pass)
+    db = mysql.connect(user=db_user, database=db_name, password=db_pass, host=db_host, auth_plugin='mysql_native_password')
     cursor = db.cursor()
     cursor.execute("SELECT Start_Time, End_Time, State FROM Schedule WHERE Serial=%s", (serial))
     results = cursor.fetchall()
@@ -346,7 +347,7 @@ def schedule_check(serial: str) -> str:
             else:
                 message = "OFF"
             # Update the state table
-            cursor.execute("UPDATE State SET State=%d WHERE Serial=%s", (state, serial))
+            cursor.execute("UPDATE State SET State=%d WHERE Serial=%s", (str(state), serial))
             db.commit()
             break    
     db.close()
@@ -354,7 +355,7 @@ def schedule_check(serial: str) -> str:
 
 # A function for checking the state of a product in the MySQL tables
 def state_check(Serial: str) -> bool:
-    db = mysql.connect(host=db_host, database=db_name, user=db_user, passwd=db_pass)
+    db = mysql.connect(user=db_user, database=db_name, password=db_pass, host=db_host, auth_plugin='mysql_native_password')
     cursor = db.cursor()
     cursor.execute("SELECT State FROM State WHERE Serial=%s", (Serial))
     state = cursor.fetchone()[0]
@@ -574,7 +575,7 @@ def update_the_state(request: Request) -> list:
     state = request["state"]
     Username = request.cookies.get("Username")
     Product_Name = request.cookies.get("Product_Name")
-    if state is "ON":
+    if state == "ON":
         state = 1
     else:
         state = 0

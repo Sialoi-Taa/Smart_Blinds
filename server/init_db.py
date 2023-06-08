@@ -9,15 +9,15 @@ import os
 import datetime
 
 # Read Database connection variables
-''' Environment Variables '''
-load_dotenv("credentials.env")
+''' Environment Variables ''' 
+load_dotenv("/Users/Family/Documents/ECE140B/Smart_Blinds/server/credentials.env")
 db_host = os.environ['MYSQL_HOST']
 db_user = os.environ['MYSQL_USER']
 db_pass = os.environ['MYSQL_PASSWORD']
 db_name = os.environ['MYSQL_DATABASE']
 
 # Connect to the db and create a cursor object
-db = mysql.connect(user=db_user, password=db_pass, host=db_host)
+db = mysql.connect(user=db_user, password=db_pass, host=db_host, auth_plugin='mysql_native_password')
 cursor = db.cursor()
 
 # Creates a DB that doesn't exist yet
@@ -81,7 +81,7 @@ try:
     );
     """)
     # Place the prototype
-    cursor.execute("INSERT INTO Unregistered (Serial) VALUES (%s)", ("PROTOTYPE"))
+    cursor.execute("INSERT INTO Unregistered (Serial) VALUES (%s)", ("PROTOTYPE",))
 except RuntimeError as err:
    print("runtime error: {0}".format(err))
 
