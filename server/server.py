@@ -3,37 +3,15 @@
 import init_db
 import uvicorn
 from fastapi import FastAPI, Request, Response
-from fastapi.responses import HTMLResponse, JSONResponse
-from fastapi.staticfiles import StaticFiles   # Used for serving static files
-from fastapi.templating import Jinja2Templates
-from fastapi.responses import StreamingResponse
-# import RPi.GPIO as GPIO
-# Import the MySQL stuff
+from fastapi.responses import HTMLResponse
+from fastapi.staticfiles import StaticFiles   
 import mysql.connector as mysql
 from dotenv import load_dotenv
 import os
 import datetime
-# Import for the ADC device
-#from ADCDevice import *
-# Import for the accelerometer
-#from mpu6050 import *
-# Import the motor library
-#from RpiMotorLib import RpiMotorLib
-import multiprocessing
 import bcrypt, secrets 
 from pydantic import BaseModel
 from urllib.request import urlopen
-import json
-import string
-
-
-
-
-
-
-
-
-
 
 
 # VARIABLE INITIALIZATION -------------------------------------------------------------------------------->
@@ -52,6 +30,7 @@ app = FastAPI()
 app.mount("/public", StaticFiles(directory="public"), name="public")
 app.mount("/views", StaticFiles(directory="views"), name="views")
 
+# Pydantic models for form data
 class Registration(BaseModel):
     Email: str
     Username: str
@@ -69,18 +48,6 @@ class Schedule(BaseModel):
     Start_Time: str
     End_Time: str
     State: str
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 # FUNCTIONS -------------------------------------------------------------------------------->
@@ -193,7 +160,6 @@ def expired_session(session_ID:str) -> bool:
 
     end_time = datetime.datetime.now()
     time_diff = end_time - start_time
-    #print(time_diff.total_seconds())
     if(time_diff.total_seconds() > 830.0):
         end_session(session_ID)
         return True
@@ -310,6 +276,7 @@ def update_state(Username:str, product_name:str, state:int) -> bool:
     else:
         return False
 
+# A function for adding a new schedule
 def add_schedule(start_time:str, end_time:str, state:str, serial:str) -> bool:
     if state == "ON":
         state = 1
@@ -355,8 +322,6 @@ def schedule_check(serial: str) -> str:
     for row in results:
         start_time_hour = int(row[0][:2])
         start_time_min  = int(row[0][3:])
-        end_time_hour   = int(row[1][:2])
-        end_time_min    = int(row[1][3:])
         state = row[2]
         # Logic for scheduling
         # When the current time matches the time for the start time of a schedule, the state will change
@@ -388,24 +353,12 @@ def state_check(Serial: str) -> bool:
 
 
 
-
-
-
-
-
-
-
-
-
 # ROUTES -------------------------------------------------------------------------------->
 # A route to the landing page
 @app.get("/", response_class=HTMLResponse)
 def get_landing_html() -> HTMLResponse:
     with open("views/Landing_Page.html") as html:
         return HTMLResponse(content=html.read())
-
-
-
 
 
 
@@ -444,9 +397,6 @@ def verify_login(login: Login, response: Response) -> dict:
 
 
 
-
-
-
 # A route for giving the user the registration HTML page
 @app.get("/register", response_class=HTMLResponse)
 def get_register_html() -> HTMLResponse:
@@ -456,10 +406,6 @@ def get_register_html() -> HTMLResponse:
 # A route that processes the user's registration data
 @app.post("/register") # registration: Registration request: Request
 async def register_user(registration: Registration) -> dict:
-    #print(registration.Email)
-    #print(registration.Username)
-    #print(registration.Password)
-
     # First check to see if the email is in use already
     Email = registration.Email
     Found = find_email(Email)
@@ -483,10 +429,6 @@ async def register_user(registration: Registration) -> dict:
     create_user(Username, password, Email)
     message = {"message": "Succeess"}
     return message
-
-
-
-
 
 
 
@@ -611,12 +553,8 @@ def update_the_state(request: Request) -> dict:
     success = update_state(Username, Product_Name, state)
     if success:
         message["message"] = "ON"
-        #for pin in GpioPins:
-            #GPIO.output(pin,GPIO.HIGH)
     else:
         message["message"] = "OFF"
-        #for pin in GpioPins:
-            #GPIO.output(pin,GPIO.LOW)
     return message
 
 # A route for getting the current state of the blinds
@@ -677,7 +615,3 @@ def get_json(serial:str) -> dict:
 
 if __name__ == '__main__':
     uvicorn.run(app, host='0.0.0.0', port=3000)
-    # Create a Process object and start the process
-    #setup()
-    #my_process = multiprocessing.Process(target=log_sensors)
-    #my_process.start()

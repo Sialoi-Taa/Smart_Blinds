@@ -11,12 +11,11 @@
         <h1>Register Below!</h1>
         <form id="Register-Form">
             <label for="Email">Email: </label>
-            <!-- pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$" -->
             <input type="email" id="Email" name="Email" title="Please input an email such as jdoe@ucsd.edu" required/><br>
             <label for="Username">Username: </label>
             <input type="text" id="Username" name="Username" pattern="[a-zA-Z0-9]{5,20}" title="Username can only be at between 5-20 characters long and may only include letters and numbers." required><br>
             <label for="Password">Password:</label>
-            <input type="text" id="Password" name="Password" pattern="(?=.*\d)(?=.*[a-zA-Z])[a-zA-Z\d]{8,}" title="Please have at least 1 digit and only letters in your password and at least 8 characters." required> <br>
+            <input type="text" id="Password" name="Password" pattern="[a-zA-Z0-9]{8,}" title="Please have at least 1 digit and only letters in your password and at least 8 characters." required> <br>
             <input type="submit">
         </form><br>
         <a href="/">Welcome Page</a><br><br>
