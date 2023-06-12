@@ -112,7 +112,6 @@ document.addEventListener("DOMContentLoaded", function() {
     var add_product = function(event) {
       event.preventDefault()
       const data = Object.fromEntries(new FormData(event.target).entries());
-      console.log(data);
       // data = {"Serial_Number": input, "Product_Name": input}
       const url = "/home";
       const verb = "post";
@@ -127,7 +126,6 @@ document.addEventListener("DOMContentLoaded", function() {
         add_button.hidden = false;
         delete_button.hidden = false;
         document.body.removeChild(reg_form);
-        //load_buttons();
         location.reload();
       })
     }
@@ -168,6 +166,7 @@ document.addEventListener("DOMContentLoaded", function() {
       form1.addEventListener("submit", delete_product, true);
     }
 
+    // A function to delete a product
     var delete_product = function(event)  {
       add_button.hidden = false;
       delete_button.hidden = false;
@@ -184,10 +183,10 @@ document.addEventListener("DOMContentLoaded", function() {
           alert("Product was successfully removed from your account!");
         }
         location.reload();
-      }); 
-      //load_buttons();
+      });
     }
 
+    // A function to check the session ID
     function check_session() {
       const url = "/sessions";
       const verb = "get";

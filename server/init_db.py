@@ -23,7 +23,8 @@ cursor = db.cursor()
 # Creates a DB that doesn't exist yet
 cursor.execute("CREATE DATABASE if not exists Smart_Blinds;")
 cursor.execute("USE Smart_Blinds;")
-# <----------------------------------------------------------->
+
+# ----------------------------------------------------------------------------->
 # Creating Tables
 try:
     # Create a Users table

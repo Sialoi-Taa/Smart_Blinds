@@ -34,7 +34,7 @@ document.addEventListener("DOMContentLoaded", function() {
           .catch(error => console.error('Error:', error));
         }
         
-        // Loads all of the schedules assigned to that product
+        // A function that loads all of the schedules assigned to that product
         function load_schedules() {
           // Goes to the server and returns the list of all schedules
           // for that specific serial number. Then loads all of them
@@ -49,7 +49,6 @@ document.addEventListener("DOMContentLoaded", function() {
             }
             // First FOR loop iterates through the rows
             for(var i = 0; i < response.length; i++) {
-              //console.log(response);
               start = response[i][0];
               end = response[i][1];
               state = response[i][2];
@@ -88,7 +87,6 @@ document.addEventListener("DOMContentLoaded", function() {
           const data = {"state": State_Button.innerHTML};
           server_request(url, data, verb, (response) => {
             let message = response["message"];
-            console.log("Change_State_Button " + message);
             Write_Button();
           });
         }
@@ -156,7 +154,7 @@ document.addEventListener("DOMContentLoaded", function() {
           state_input.type = "text";
           state_input.id = "State";
           state_input.name = "State";
-          state_input.pattern = "(?=.*[A-Z]){2,3}[A-Z]*$";
+          state_input.pattern = "[A-Z]{2,3}";
           state_input.title = "Input should be either ON or OFF"
           form.appendChild(state_label);
           form.appendChild(state_input);
@@ -183,10 +181,8 @@ document.addEventListener("DOMContentLoaded", function() {
           const url = "/schedule";
           const verb = "post";
           const data = Object.fromEntries(new FormData(event.target).entries());
-          //console.log(data);
           server_request(url, data, verb, function(response) {
             message = response["message"];
-            //console.log(response);
             alert(message);
             document.body.removeChild(document.getElementById("Time_Input"));
             Add_Button.hidden = false
@@ -214,12 +210,11 @@ document.addEventListener("DOMContentLoaded", function() {
           return null;
         }
 
+        // A function to get the state of the button after a schedule event has passed
         function schedule_change_state() {
           const url = "/schedule/product";
           const verb = "get";
-          console.log("here");
           server_get(url, verb, (response) => {
-            console.log("in");
             message = response["message"];
             Write_Button();
           })
