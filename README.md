@@ -19,30 +19,6 @@ In the login page, the user's input will be processed and see if we have any cre
 ![Back End Design](images/BED.jpg)
 
 ___
-# NOTES FOR NEXT TIME
-* You finished the landing, login, and registration page.
-* You're finishing the HTML and JS integration for the home page.
-* You need to add the setInterval function to keep checking the cookies
-* After finishing up the Home page, get started on the Product page that will hold the customization for each individual product.
-* The customization page will connect and change the Schedule and State tables accordingly and possibly add multiprocessing that will run on the server to follow the schedules.
-* Look at a way for a controller to stay connected to the internet and keep getting server updates for IoT.
-
-# NEED TO BE DONE
-* ~~Make schematic~~ - Sialoi
-* UI design - Taimur
-* UX design - Taimur
-* ~~Information architecture~~ - Sialoi
-* ~~Finalize all technical capabilities for components/hardware~~ - Sialoi
-* Make a general cost and profit model - Taimur
-* Make a poster - Taimur
-* ~~Collect components~~ - Christian
-* ~~Create the circuit~~ - Sialoi
-* ~~Create mock model~~ - Christian
-* Assemble model - Christian
-* Debugging and testing - Sialoi
-* Prep live demonstration - Everyone
-  
-___
 # USEFUL LINKS
 https://stackoverflow.com/questions/10502645/serving-a-local-website-via-bluetooth-to-a-cellphone-without-using-the-internet - Taimur
 
@@ -86,7 +62,4 @@ ___
 In this graphic, you can see that the way our IoT component works is that for this demonstration my laptop will act as the host server. Every product will have a Raspberry Pi that will first act as an access point for the user. When the user connects to the 'Smart_Blinds' network, they will be prompted to place their network information for the Pi to be connected to internet. After successful connection to the internet, the Pi will make routine fetches to specific routes that will be received by the server and will be given back a dictionary of information. This information will tell the Pi whether it should be ON or OFF right now. To prevent any type of hacking over this public server, the route will only give back whether the product should be ON or OFF at the moment. Nothing private should be shared inside the information being sent back to the Pi!   
 
 The main way for the user to be able to access this product is through the site, and they will be able to make new schedules and also toggle the state of their Smart Blinds product. In the graphic, it shows a women accessing her blinds from her laptop outside. This is an example of how the signed in user will be able to manage their blinds' settings from anywhere in the world as long as the server on the hosting machine is up and running
-___
-# Marketing Scheme - Sialoi
-For the marketing scheme, we had the idea of making the blinds come with the scheduling and toggle feature. After that, we sell packages of extra customizable features that the user could pay for. These features will have different prices and subscription models. An example of this is that we could have a feature that will tell how many times you toggle the state of the blinds and make a model to automatically control the Smart Blinds during all times of the day. This would be a subscription type of feature because it requires constant computation on our side. But then we have a feature such as dimming the blinds to a certain percentage that will be a one time purchase and the user will be able to use that feature on all Smart Blinds product under that account. If the product is continued down the line, then more flushed out and detailed features will be presented and decided to be on a subscription or one time purchase model.
 ___
